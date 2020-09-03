@@ -36,8 +36,8 @@ class BehaviorViews(object):
         wu.save_words_to_collect_dict(words_list)
         return True
 
-    # # 获取单词列表
-    # def get_words_list(self):
-    #     wu = WorkerUser()
-    #     wu.work_for_user_id = self.user_id
-    #     reutrn wu.get_words_list()
+    # 获取单词列表
+    def get_words_list(self):
+        wu = WorkerUser()
+        wu.work_for_user_id = self.user_id
+        return wu.get_words_list()

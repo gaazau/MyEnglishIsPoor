@@ -30,6 +30,7 @@ class BehaviorInterface(object):
         return query
 
     def get_user_dict_record(self, user_id):
+        max_at = Behavior.select(Behavior.last_search_at)
         query = Behavior.select(
             Behavior.user_id,
             Behavior.collect_dict_id,
@@ -46,7 +47,7 @@ class BehaviorInterface(object):
             CollectDict.create_at,
         ).join(
             CollectDict, on=(CollectDict.id == Behavior.collect_dict_id)
-        ).where(Behavior.user_id == user_id)
+        ).where(Behavior.user_id == user_id, Behavior.last_search_at==max_at).dicts()
         return query
 
     def get_stop_words(self, user_ids):

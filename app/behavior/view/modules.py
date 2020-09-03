@@ -170,4 +170,22 @@ class WorkerUser(object):
         return True
     
     def get_words_list(self):
-        return  DBWorker().get_user_dict_record(self.work_for_user_id)
+        query = DBWorker().get_user_dict_record(self.work_for_user_id)
+        user_dict = []
+        for row in query:
+            user_dict.append({
+                'user_id': row['user_id'],
+                'collect_dict_id': row['collect_dict_id'],
+                'is_stop': row['is_stop'],
+                'is_done': row['is_done'],
+                'last_search_at': row['last_search_at'],
+                'word': row['word'],
+                'phonetic': row['phonetic'],
+                'definition': row['definition'],
+                'translation': row['translation'],
+                'nltk_short_type': row['nltk_short_type'],
+                'nltk_type': row['nltk_type'],
+                'nltk_type_name': row['nltk_type_name'],
+                'create_at': row['create_at'],
+            })
+        return sorted(user_dict, key=lambda  x: x['word'])  

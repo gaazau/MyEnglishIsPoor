@@ -34,8 +34,7 @@ class TestViews:
 
         bv.commit_words_list(word_package['detail_words'])
     
-    # def test_get_user_dict(self):
-    #     bv = BehaviorViews(1001)
-    #     query = bv.get_words_list()
-    #     for row in query:
-    #         print(row)
+    def test_get_user_dict(self):
+        bv = BehaviorViews(1001)
+        cur_words_list = bv.get_words_list()
+        
