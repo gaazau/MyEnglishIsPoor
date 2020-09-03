@@ -39,13 +39,11 @@ class WorkerPost():
             return set(re.findall(self.english_words_pattern, content))
         return list(re.findall(self.english_words_pattern, content))
 
-    def exclude_stop_words(self, src_words_set, with_base_stop_words=False):
+    def exclude_stop_words(self, src_words_set):
         """排除停用词"""
         user_ids = set()
         if self.work_for_user_id:
             user_ids.add(self.work_for_user_id)
-        if self.with_base_stop_words
-        user_ids.add(settings.STOPWORD_USER_ID)
         if not user_ids:
             return src_words_set
         stop_words = set(DBWorker().get_stop_words(user_ids))
@@ -66,7 +64,7 @@ class WorkerWord(object):
             tags_dict[tag[0]] = {
                 "type": tag[1],
                 "short_type": tag[1][0],
-                "name": WTDICT.get(tag[1], "")
+                "name": settings.NLTK_WORD_TYPE_DICT.get(tag[1], "")
             }
         return tags_dict
 
@@ -75,20 +73,23 @@ class WorkerWord(object):
         word_miss_list = []
         if not words_list:
             return word_done_list, word_miss_list
-        words_detail_source = DBWorker().get_words_detail(words_list)
+        lower_word_list = [word.lower() for word in words_list]
+        detail_dict = DBWorker().get_words_detail(lower_word_list)
         word_type_dict = self.get_word_type_dict(words_list)
-        for detail in words_detail_source:
-            if word not in words_list:
+        
+        for word in words_list:
+            if word.lower() not in detail_dict:
                 word_miss_list.append(word)
                 continue
+            detail = detail_dict[word.lower()]
             word_done_list.append({
-                "word": detail.word,
+                "word": word,
                 "phonetic": detail.phonetic,
                 "definition": detail.definition,
                 "translation": detail.translation,
-                "type": word_type_dict.get("type", ""),
-                "short_type": word_type_dict.get("short_type", ""),
-                "name": word_type_dict.get("name", ""),
+                "type": word_type_dict.get(word, {}).get('type', ''),
+                "short_type": word_type_dict.get(word, {}).get('short_type', ''),
+                "name": word_type_dict.get(word, {}).get('name', ''),
             })
         return word_done_list, word_miss_list
 
@@ -144,27 +145,29 @@ class DataWorker(object):
             })
         return words_list
 
+
 class WorkerUser(object):
     """用户行为"""
 
-    def __init__(self, user_id):
-        self.work_for_user_id = user_id
+    def __init__(self):
+        self.work_for_user_id = 0
 
     def save_words_to_collect_dict(self, words_list):
-        words = list({words['word'] for words in words_list})
-        query = DBWorker().get_word_collection(self.work_for_user_id, words)
-        exists_words = [row['word'] for row in query ] 
+        words = sorted({words['word'] for words in words_list})
+        query = DBWorker().get_word_collection(words)
+        exists_words = [row.word for row in query]
         need_to_save_words = []
         for row in words_list:
             if row['word'] in exists_words:
                 continue
             need_to_save_words.append(row)
-        return DBWorker().save_words_to_collect_dict(need_to_save_words)
+        DBWorker().insert_words_into_collect_dict(need_to_save_words)
 
-    def create_user_behavior(self, collection_id, is_done=False, is_stop=False):
-        return DBWorker().update_user_behavior(
-            self.work_for_user_id,
-            collection_id,
-            is_done,
-            is_stop
-        )
+        behavior_words = sorted({words['word'] for words in need_to_save_words})
+        query = DBWorker().get_word_collection(behavior_words)
+        need_to_save_bahavior = [row.id for row in query]
+        DBWorker().insert_to_behavior(self.work_for_user_id, need_to_save_bahavior)
+        return True
+    
+    def get_words_list(self):
+        return  DBWorker().get_user_dict_record(self.work_for_user_id)

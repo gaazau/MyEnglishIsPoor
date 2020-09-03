@@ -2,6 +2,7 @@ from peewee import Model
 from peewee import SqliteDatabase
 from peewee import IntegerField
 from peewee import CharField
+from peewee import TextField
 
 from app import settings
 
@@ -60,12 +61,12 @@ CREATE TABLE "collect_dict" (
 class CollectDict(Model):
     id = IntegerField(column_name="id")
     word = CharField(column_name="word")
-    word_kind = CharField(column_name="work_kind")
     phonetic = CharField(column_name="phonetic")
     definition = CharField(column_name="definition")
     translation = CharField(column_name="translation")
     nltk_short_type = CharField(column_name="nltk_short_type")
-    batch_id = IntegerField(column_name="batch_id")
+    nltk_type = CharField(column_name="nltk_type")
+    nltk_type_name = CharField(column_name="nltk_type_name")
     create_at = IntegerField(column_name="create_at")
 
     class Meta:

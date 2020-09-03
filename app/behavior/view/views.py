@@ -27,7 +27,7 @@ class BehaviorViews(object):
         ww = WorkerWord()
         ww.work_for_user_id = self.user_id
         detail_words, miss_words = ww.get_words_detail_info(words_list)
-        return {"detail_words": detail_words, "miss_words": miss_words}
+        return {"detail_words": sorted(detail_words, key=lambda x:x['word']), "miss_words": sorted(miss_words)}
 
     # 保存当前单词表
     def commit_words_list(self, words_list):
@@ -36,9 +36,8 @@ class BehaviorViews(object):
         wu.save_words_to_collect_dict(words_list)
         return True
 
-    def create_user_behavior(self, collection_id, is_done, is_stop):
-        wu = WorkerUser()
-        wu.work_for_user_id = self.user_id
-        wu.update_user_behavior(
-            collection_id, is_done=is_done, is_stop=is_stop)
-        return True
+    # # 获取单词列表
+    # def get_words_list(self):
+    #     wu = WorkerUser()
+    #     wu.work_for_user_id = self.user_id
+    #     reutrn wu.get_words_list()
