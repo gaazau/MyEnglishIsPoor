@@ -8,5 +8,5 @@ if __name__ == "__main__":
     window = WordsWindow()
     window.resize(600, 800)
     window.show()
-    
+
     sys.exit(app.exec_())

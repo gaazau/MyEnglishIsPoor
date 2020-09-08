@@ -62,16 +62,27 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.layout = QHBoxLayout()
         self.layout.setObjectName(u"layout")
-        self.cbWords = QComboBox(self.tab_words)
-        self.cbWords.setObjectName(u"cbWords")
+        self.pushButton_3 = QPushButton(self.tab_words)
+        self.pushButton_3.setObjectName(u"pushButton_3")
 
-        self.layout.addWidget(self.cbWords)
+        self.layout.addWidget(self.pushButton_3)
+
+        self.pushButton_2 = QPushButton(self.tab_words)
+        self.pushButton_2.setObjectName(u"pushButton_2")
+
+        self.layout.addWidget(self.pushButton_2)
+
+        self.pushButton = QPushButton(self.tab_words)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.layout.addWidget(self.pushButton)
 
 
         self.verticalLayout_3.addLayout(self.layout)
 
         self.tvWords = QTableView(self.tab_words)
         self.tvWords.setObjectName(u"tvWords")
+        self.tvWords.setSortingEnabled(True)
 
         self.verticalLayout_3.addWidget(self.tvWords)
 
@@ -116,7 +127,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -133,6 +144,9 @@ class Ui_MainWindow(object):
         self.btnLoad.setText(QCoreApplication.translate("MainWindow", u"\u52a0\u8f7d\u6587\u4ef6", None))
         self.btnCreate.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_op), QCoreApplication.translate("MainWindow", u"\u6587\u7ae0\u64cd\u4f5c", None))
+        self.pushButton_3.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton_2.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
+        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"PushButton", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_words), QCoreApplication.translate("MainWindow", u"\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_phrase), QCoreApplication.translate("MainWindow", u"\u77ed\u8bed\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_grammer), QCoreApplication.translate("MainWindow", u"\u53e5\u578b\u672c", None))

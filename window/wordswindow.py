@@ -1,43 +1,3 @@
-#############################################################################
-##
-## Copyright (C) 2019 The Qt Company Ltd.
-## Contact: http://www.qt.io/licensing/
-##
-## This file is part of the Qt for Python examples of the Qt Toolkit.
-##
-## $QT_BEGIN_LICENSE:BSD$
-## You may use this file under the terms of the BSD license as follows:
-##
-## "Redistribution and use in source and binary forms, with or without
-## modification, are permitted provided that the following conditions are
-## met:
-##   * Redistributions of source code must retain the above copyright
-##     notice, this list of conditions and the following disclaimer.
-##   * Redistributions in binary form must reproduce the above copyright
-##     notice, this list of conditions and the following disclaimer in
-##     the documentation and/or other materials provided with the
-##     distribution.
-##   * Neither the name of The Qt Company Ltd nor the names of its
-##     contributors may be used to endorse or promote products derived
-##     from this software without specific prior written permission.
-##
-##
-## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-##
-## $QT_END_LICENSE$
-##
-#############################################################################
-
 from __future__ import print_function, absolute_import
 
 from PySide2.QtWidgets import (QAbstractItemView, QDataWidgetMapper,QFileDialog,
@@ -49,8 +9,49 @@ from PySide2.QtCore import Qt, Slot, QFile
 from ui_wordsbook import Ui_MainWindow
 # from bookdelegate import BookDelegate
 
+from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
+
 from core.views import Views
 
+
+import operator
+from PySide2 import QtWidgets
+from PySide2 import QtGui
+from PySide2 import QtCore
+
+
+class WordsListModel(QtCore.QAbstractTableModel):
+    def __init__(self, parent, mylist, header, *args):
+        QtCore.QAbstractTableModel.__init__(self, parent, *args)
+        self.mylist = mylist
+        self.header = header
+
+    def rowCount(self, parent):
+        return len(self.mylist)
+
+    def columnCount(self, parent):
+        return len(self.mylist[0])
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+        elif role != QtCore.Qt.DisplayRole:
+            return None
+        return self.mylist[index.row()][index.column()]
+
+    def headerData(self, col, orientation, role):
+        if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
+            return self.header[col]
+        return None
+
+    def sort(self, col, order):
+        """sort table by given column number col"""
+        self.emit(QtCore.SIGNAL("layoutAboutToBeChanged()"))
+        self.mylist = sorted(self.mylist,
+                                key=operator.itemgetter(col))
+        if order == QtCore.Qt.DescendingOrder:
+            self.mylist.reverse()
+        self.emit(QtCore.SIGNAL("layoutChanged()"))
 
 class WordsWindow(QMainWindow, Ui_MainWindow):
     """A window to show the books available"""
@@ -70,7 +71,18 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def CreateWords(self):
         origin_words = Views().extract_english_words(self.txtPost.toPlainText())
-        print(origin_words)
+        data_list = []
+        header = ['单词', '中文定义', '英文定义', '发音', '词性分类']
+        for word in origin_words:
+            row = ['', '', '', '', '']
+            row[0] = str(word)
+            data_list.append(row)
+
+        self.tvWords.setModel(WordsListModel(self, data_list, header))
+        # set column width to fit contents (set font first!)
+        self.tvWords.resizeColumnsToContents()
+        self.tabWidget.setCurrentIndex(1)
+
 
     def __init__(self):
         QMainWindow.__init__(self)
