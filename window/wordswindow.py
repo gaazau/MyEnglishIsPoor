@@ -71,13 +71,17 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def CreateWords(self):
         origin_words = Views().extract_english_words(self.txtPost.toPlainText())
+        stop_words = []
+        clean_words = Views().exclude_stop_words(origin_words, stop_words)
+        if not clean_words:
+            return
         data_list = []
-        header = ['单词', '中文定义', '英文定义', '发音', '词性分类']
-        for word in origin_words:
+        header = ['单词', '英文定义', '中文定义', '发音', '词性分类']
+        for word in clean_words:
             row = ['', '', '', '', '']
             row[0] = str(word)
             data_list.append(row)
-
+        
         self.tvWords.setModel(WordsListModel(self, data_list, header))
         # set column width to fit contents (set font first!)
         self.tvWords.resizeColumnsToContents()
