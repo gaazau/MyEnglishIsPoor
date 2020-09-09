@@ -67,7 +67,7 @@ class DbInterface(object):
         return self.db.delete_post_words(post_id)
 
     def delete_behavior(self, words):
-        return self.db.delete_behavior(delete_behavior)
+        return self.db.delete_behavior(words)
 
     def delete_word_list(self, words):
         return self.db.delete_word_list(words)

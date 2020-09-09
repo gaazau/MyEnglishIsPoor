@@ -159,10 +159,11 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             global_data.selected_post_id = post_id
             post_data = DbInterface().get_post(post_id)
             global_data.post_word_data = DbInterface().get_post_word_data(post_id)
-            if post_data:
-                self.le_title.setText(post_data['title'])
-                self.le_url.setText(post_data['url'])
-                self.txtPost.setPlainText("\n".join([row['word'] for row in global_data.post_word_data]))
+            if not post_data:
+                return
+            self.le_title.setText(post_data['title'])
+            self.le_url.setText(post_data['url'])
+            self.txtPost.setPlainText("\n".join([row['word'] for row in global_data.post_word_data]))
 
     def delete_post_node(self):
         if not global_data.selected_post_id:
