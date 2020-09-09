@@ -2,7 +2,7 @@ from __future__ import print_function, absolute_import
 
 from PySide2.QtWidgets import (QAbstractItemView, QDataWidgetMapper,QFileDialog,
     QHeaderView, QMainWindow, QMessageBox)
-from PySide2.QtGui import QKeySequence
+from PySide2.QtGui import QKeySequence,QColor
 from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
 from PySide2.QtCore import Qt, Slot, QFile
 # import createdb
@@ -37,9 +37,18 @@ class WordsListModel(QtCore.QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return None
-        elif role != QtCore.Qt.DisplayRole:
-            return None
-        return self.mylist[index.row()][index.column()]
+        elif role == QtCore.Qt.DisplayRole:
+            return self.mylist[index.row()][index.column()]
+        elif role == Qt.BackgroundRole:
+            if index.column() == 0 and global_data.behavior_data:
+                statu = global_data.behavior_data[index.row()]
+                color = Qt.white
+                if statu == 1:
+                    color = Qt.green
+                elif statu == 2:
+                    color = Qt.gray
+                return QColor(color)
+        return None
 
     def headerData(self, col, orientation, role):
         if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
@@ -82,6 +91,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             return
         star_words_dict = DbInterface().get_words_detail(clean_words)
         global_data.word_list_data = [] 
+        global_data.behavior_data = [] 
         header = ['单词', '中文定义', '发音', '英文定义', '词性分类']
         for word in clean_words:
             row = [str(word), '', '', '', '']
@@ -91,6 +101,12 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 row[2] = detail['phonetic']
                 row[3] = detail['definition']
             global_data.word_list_data.append(row)
+
+            # 0:未读 1：已读  2：停用
+            behavior_statu = 0
+            if not detail:
+                behavior_statu = 2
+            global_data.behavior_data.append(behavior_statu)
         
         self.tvWords.setModel(WordsListModel(self, global_data.word_list_data, header))
         self.tvWords.setWordWrap(True)
@@ -101,7 +117,9 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     def tvWords_left_click(self, item):
         if item.column() == 0 and item.row()>=0:
-            print(global_data.word_list_data[item.row()])
+            statu = global_data.behavior_data[item.row()]
+            global_data.behavior_data[item.row()] = (statu + 1) % 4
+            print(global_data.behavior_data[item.row()])
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -111,3 +129,6 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.btnCreate.clicked.connect(self.CreateWords)
         # 鼠标左键点击事件
         self.tvWords.clicked.connect(self.tvWords_left_click)
+
+
+        # self.btn_words_save.clicked.connect()
