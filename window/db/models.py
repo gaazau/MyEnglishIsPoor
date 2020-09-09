@@ -8,8 +8,8 @@ class BaseModel(Model):
         database = database
 
 class Behavior(BaseModel):
+    word = TextField(null=True, primary_key=True)
     word_statu = IntegerField(constraints=[SQL("DEFAULT 0")])
-    word_list_id = AutoField(null=True)
 
     class Meta:
         table_name = 'behavior'
@@ -22,6 +22,18 @@ class Post(BaseModel):
     class Meta:
         table_name = 'post'
 
+class PostWords(BaseModel):
+    post_id = IntegerField(null=True)
+    word = TextField(null=True)
+
+    class Meta:
+        table_name = 'post_words'
+        indexes = (
+            (('post_id', 'word'), True),
+        )
+        primary_key = CompositeKey('post_id', 'word')
+
+
 class StopWords(BaseModel):
     word = TextField(constraints=[SQL("DEFAULT ''")], unique=True)
 
@@ -29,23 +41,15 @@ class StopWords(BaseModel):
         table_name = 'stop_words'
 
 class WordList(BaseModel):
-    definition = TextField(constraints=[SQL("DEFAULT ''")])
-    phonetic = TextField(constraints=[SQL("DEFAULT ''")])
-    post_id = IntegerField(constraints=[SQL("DEFAULT 0")], index=True)
-    translation = TextField(constraints=[SQL("DEFAULT ''")])
-    word = FloatField(constraints=[SQL("DEFAULT ''")], index=True)
-    word_type = TextField(constraints=[SQL("DEFAULT ''")])
+    definition = IntegerField(constraints=[SQL("DEFAULT ''")])
+    phonetic = IntegerField(constraints=[SQL("DEFAULT ''")])
+    translation = IntegerField(constraints=[SQL("DEFAULT ''")])
+    word = TextField(null=True, primary_key=True)
+    word_type = IntegerField(constraints=[SQL("DEFAULT ''")])
 
     class Meta:
         table_name = 'word_list'
 
-
-class PostWords(BaseModel):
-    post_id = IntegerField()
-    word_list_id = IntegerField()
-
-    class Meta:
-        table_name = 'post_words'
 
 
 

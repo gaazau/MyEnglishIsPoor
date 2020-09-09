@@ -21,6 +21,8 @@ from PySide2 import QtCore
 from db.db_interface import DbInterface
 import global_data
 
+from copy import deepcopy
+import settings
 
 class WordsListModel(QtCore.QAbstractTableModel):
     def __init__(self, parent, mylist, header, *args):
@@ -87,8 +89,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 return
         stop_words = DbInterface().get_stop_words()
         clean_words = Views().exclude_stop_words(origin_words, stop_words)
+        clean_words = Views().filter_done_words(clean_words)
         if not clean_words:
             return
+        word_type_dict = Views().get_word_type_dict(clean_words)
         star_words_dict = DbInterface().get_words_detail(clean_words)
         global_data.word_list_data = [] 
         global_data.behavior_data = [] 
@@ -100,15 +104,20 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 row[1] = detail['translation']
                 row[2] = detail['phonetic']
                 row[3] = detail['definition']
+                row[4] = word_type_dict.get(str(word), '')
             global_data.word_list_data.append(row)
-
+            
             # 0:未读 1：已读  2：停用
             behavior_statu = 0
             if not detail:
                 behavior_statu = 2
             global_data.behavior_data.append(behavior_statu)
         
-        self.tvWords.setModel(WordsListModel(self, global_data.word_list_data, header))
+        word_list = deepcopy(global_data.word_list_data)
+        for word in word_list:
+            word[4] = settings.NLTK_WORD_TYPE_DICT.get(word[4], '')
+        
+        self.tvWords.setModel(WordsListModel(self, word_list, header))
         self.tvWords.setWordWrap(True)
         self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -118,8 +127,11 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     def tvWords_left_click(self, item):
         if item.column() == 0 and item.row()>=0:
             statu = global_data.behavior_data[item.row()]
-            global_data.behavior_data[item.row()] = (statu + 1) % 4
-            print(global_data.behavior_data[item.row()])
+            global_data.behavior_data[item.row()] = (statu + 1) % 3
+
+    @Slot()
+    def tvWords_save(self):
+        Views().save_word_list(global_data.word_list_data, global_data.behavior_data)
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -131,4 +143,4 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.tvWords.clicked.connect(self.tvWords_left_click)
 
 
-        # self.btn_words_save.clicked.connect()
+        self.btn_words_save.clicked.connect(self.tvWords_save)

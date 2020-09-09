@@ -16,6 +16,18 @@ class DbInterface(object):
         star_word_dict = self.db.get_words_detail(words)
         return star_word_dict
 
+    def save_word_list(self, words_list_to_save):
+        return self.db.save_word_list(words_list_to_save)
+
+    def get_done_word_list(self, word_list):
+        return self.db.get_done_word_list(word_list)
+
+    def save_behavior(self, behavior_data):
+        return self.db.save_behavior(behavior_data)
+
+    def save_stop_words(self, stop_word_data):
+        return self.db.save_stop_words(stop_word_data)
+
 
 class SqliteInterface(object):
     def get_stop_words(self):
@@ -40,3 +52,24 @@ class SqliteInterface(object):
                 'translation': row.translation
             }
         return words_dict
+
+    def save_word_list(self, words_list):
+        query = WordList.insert_many(words_list).execute()
+        return query > 0
+
+    def get_done_word_list(self, word_list):
+        query = WordList.select(
+            WordList.word
+        ).join(
+            Behavior,
+            on=(Behavior.word == WordList.word)
+        ).where(WordList.word.in_(word_list), Behavior.word_statu > 0)
+        return [row.word for row in query]
+
+    def save_behavior(self, behavior_data):
+        query = Behavior.insert_many(behavior_data).execute()
+        return query > 0
+
+    def save_stop_words(self, stop_word_data):
+        query = Behavior.insert_many(stop_word_data).execute()
+        return query > 0
