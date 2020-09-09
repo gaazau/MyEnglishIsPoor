@@ -3,6 +3,8 @@ from db.models import Post
 from db.models import StopWords
 from db.models import WordList
 from db.models import Stardict
+from db.models import PostWords
+from datetime import datetime
 
 
 class DbInterface(object):
@@ -34,6 +36,14 @@ class DbInterface(object):
             return True
         return self.db.save_stop_words(stop_word_data)
 
+    def save_post(self, title, url, post_hash):
+        return self.db.save_post(title, url, post_hash)
+
+    def save_post_words(self, post_data):
+        if not post_data:
+            return True
+        return self.db.save_post_words(post_data)
+
 
 class SqliteInterface(object):
     def get_stop_words(self):
@@ -60,7 +70,8 @@ class SqliteInterface(object):
         return words_dict
 
     def save_word_list(self, words_list):
-        query = WordList.insert_many(words_list).on_conflict('replace').execute()
+        query = WordList.insert_many(
+            words_list).on_conflict('replace').execute()
         return query > 0
 
     def get_done_word_list(self, word_list):
@@ -73,9 +84,17 @@ class SqliteInterface(object):
         return [row.word for row in query]
 
     def save_behavior(self, behavior_data):
-        query = Behavior.insert_many(behavior_data).on_conflict('replace').execute()
+        query = Behavior.insert_many(
+            behavior_data).on_conflict('replace').execute()
         return query > 0
 
     def save_stop_words(self, stop_word_data):
-        query = StopWords.insert_many(stop_word_data).on_conflict('replace').execute()
+        query = StopWords.insert_many(
+            stop_word_data).on_conflict('replace').execute()
         return query > 0
+
+    def save_post(self, title, url, post_hash):
+        return Post.insert(title=title, url=url, post_hash=post_hash, create_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')).execute()
+
+    def save_post_words(self, post_data):
+        return PostWords.insert_many(post_data).execute()

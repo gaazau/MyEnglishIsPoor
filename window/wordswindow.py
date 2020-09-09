@@ -1,4 +1,4 @@
-from __future__ import print_function, absolute_import
+import os
 
 from PySide2.QtWidgets import (QAbstractItemView, QDataWidgetMapper,QFileDialog,
     QHeaderView, QMainWindow, QMessageBox)
@@ -81,6 +81,8 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 text = inFile.readAll()
                 text = str(text, encoding='utf8')
                 self.txtPost.setPlainText(text)
+                _, filename = os.path.split(inFile.fileName())
+                self.le_title.setText(str(filename))
 
     @Slot()
     def CreateWords(self):
@@ -118,6 +120,12 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             word[4] = settings.NLTK_WORD_TYPE_DICT.get(word[4], '')
         
         self.tvWords.setModel(WordsListModel(self, word_list, header))
+
+        global_data.post_data = {
+            "title": self.le_title.text(),
+            "url": self.le_url.text()
+        }
+
         self.tvWords.setWordWrap(True)
         self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
@@ -131,7 +139,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def tvWords_save(self):
-        Views().save_word_list(global_data.word_list_data, global_data.behavior_data)
+        Views().save_word_list(global_data.word_list_data, global_data.behavior_data, global_data.post_data)
 
     def __init__(self):
         QMainWindow.__init__(self)

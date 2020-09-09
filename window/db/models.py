@@ -15,9 +15,11 @@ class Behavior(BaseModel):
         table_name = 'behavior'
 
 class Post(BaseModel):
-    create_at = IntegerField(constraints=[SQL("DEFAULT 0")])
-    detail = TextField(constraints=[SQL("DEFAULT ''")])
+    id = IntegerField(primary_key=True, sequence=True)
+    create_at = TextField()
+    url = TextField(constraints=[SQL("DEFAULT ''")])
     title = TextField(constraints=[SQL("DEFAULT ''")])
+    post_hash = TextField()
 
     class Meta:
         table_name = 'post'

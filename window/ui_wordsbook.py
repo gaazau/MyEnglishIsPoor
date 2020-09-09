@@ -31,29 +31,71 @@ class Ui_MainWindow(object):
         self.tabWidget.setObjectName(u"tabWidget")
         self.tab_op = QWidget()
         self.tab_op.setObjectName(u"tab_op")
-        self.verticalLayout_2 = QVBoxLayout(self.tab_op)
+        self.verticalLayout_7 = QVBoxLayout(self.tab_op)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_6 = QVBoxLayout()
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.groupBox_2 = QGroupBox(self.tab_op)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.verticalLayout_2 = QVBoxLayout(self.groupBox_2)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.horizontalLayout_3 = QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.label_2 = QLabel(self.groupBox_2)
+        self.label_2.setObjectName(u"label_2")
+
+        self.horizontalLayout_3.addWidget(self.label_2)
+
+        self.le_title = QLineEdit(self.groupBox_2)
+        self.le_title.setObjectName(u"le_title")
+
+        self.horizontalLayout_3.addWidget(self.le_title)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.label_3 = QLabel(self.groupBox_2)
+        self.label_3.setObjectName(u"label_3")
+
+        self.horizontalLayout_4.addWidget(self.label_3)
+
+        self.le_url = QLineEdit(self.groupBox_2)
+        self.le_url.setObjectName(u"le_url")
+
+        self.horizontalLayout_4.addWidget(self.le_url)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_4)
+
+
+        self.verticalLayout_6.addWidget(self.groupBox_2)
+
         self.txtPost = QTextEdit(self.tab_op)
         self.txtPost.setObjectName(u"txtPost")
 
-        self.verticalLayout_2.addWidget(self.txtPost)
+        self.verticalLayout_6.addWidget(self.txtPost)
+
+
+        self.verticalLayout_7.addLayout(self.verticalLayout_6)
 
         self.groupBox = QGroupBox(self.tab_op)
         self.groupBox.setObjectName(u"groupBox")
-        self.horizontalLayout = QHBoxLayout(self.groupBox)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout_2 = QHBoxLayout(self.groupBox)
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.btnLoad = QPushButton(self.groupBox)
         self.btnLoad.setObjectName(u"btnLoad")
 
-        self.horizontalLayout.addWidget(self.btnLoad)
+        self.horizontalLayout_2.addWidget(self.btnLoad)
 
         self.btnCreate = QPushButton(self.groupBox)
         self.btnCreate.setObjectName(u"btnCreate")
 
-        self.horizontalLayout.addWidget(self.btnCreate)
+        self.horizontalLayout_2.addWidget(self.btnCreate)
 
 
-        self.verticalLayout_2.addWidget(self.groupBox)
+        self.verticalLayout_7.addWidget(self.groupBox)
 
         self.tabWidget.addTab(self.tab_op, "")
         self.tab_words = QWidget()
@@ -122,7 +164,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -130,13 +172,16 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u8be6\u7ec6\u4fe1\u606f", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u6807\u9898:", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"URL: ", None))
         self.txtPost.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"\u64cd\u4f5c", None))
-        self.btnLoad.setText(QCoreApplication.translate("MainWindow", u"\u52a0\u8f7d\u6587\u4ef6", None))
+        self.btnLoad.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u6587\u4ef6", None))
         self.btnCreate.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_op), QCoreApplication.translate("MainWindow", u"\u6587\u7ae0\u64cd\u4f5c", None))
         self.btn_words_save.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0\u72b6\u6001", None))

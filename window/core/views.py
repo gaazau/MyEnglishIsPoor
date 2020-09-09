@@ -34,7 +34,7 @@ class Views(object):
         done_words = DbInterface().get_done_word_list(word_list)
         return [word for word in word_list if word not in done_words]
     
-    def save_word_list(self, word_list, behavior_list):
+    def save_word_list(self, word_list, behavior_list, post_dict):
         word_data = []
         behavior_data = []
         stop_word_data = []
@@ -58,4 +58,19 @@ class Views(object):
         DbInterface().save_word_list(word_data)
         DbInterface().save_behavior(behavior_data)
         DbInterface().save_stop_words(stop_word_data)
+        try:
+            post_words = "\n".join(sorted({row['word'] for row in word_data}))
+            post_id = DbInterface().save_post(post_dict['title'], post_dict['url'], str(hash(post_words)))
+        except Exception:
+            post_id = None
+        if post_id:
+            post_data = []
+            for row in word_data:
+                post_data.append({
+                    'post_id': post_id,
+                    'word': row['word'],
+                })
+            DbInterface().save_post_words(post_data)
         return True
+
+        
