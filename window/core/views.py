@@ -73,4 +73,13 @@ class Views(object):
             DbInterface().save_post_words(post_data)
         return True
 
-        
+    def delete_post_words(self, post_id):
+        if not post_id:
+            return True
+        words = DbInterface().get_post_words_unique(post_id)
+        DbInterface().delete_post(post_id)
+        DbInterface().delete_post_words(post_id)
+        if words:
+            DbInterface().delete_behavior(words)
+            DbInterface().delete_word_list(words)
+

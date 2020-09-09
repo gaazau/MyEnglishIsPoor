@@ -141,6 +141,36 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     def tvWords_save(self):
         Views().save_word_list(global_data.word_list_data, global_data.behavior_data, global_data.post_data)
 
+    def load_posts(self):
+        self.tlwPost.clear()
+        global_data.post_list = DbInterface().get_posts()
+        post_list = [str(row['id']) + ":" + str(row['title']) for row in global_data.post_list]
+        self.tlwPost.addItems(post_list)
+
+    @Slot()
+    def tab_changed(self, index):
+        if index == 0:
+            self.load_posts()
+
+    @Slot()
+    def selected_post(self, item):
+        post_id = int(str(item.data()).split(":")[0])
+        if post_id:
+            global_data.selected_post_id = post_id
+            post_data = DbInterface().get_post(post_id)
+            global_data.post_word_data = DbInterface().get_post_word_data(post_id)
+            if post_data:
+                self.le_title.setText(post_data['title'])
+                self.le_url.setText(post_data['url'])
+                self.txtPost.setPlainText("\n".join([row['word'] for row in global_data.post_word_data]))
+
+    def delete_post_node(self):
+        if not global_data.selected_post_id:
+            return
+        Views().delete_post_words(global_data.selected_post_id)
+        global_data.selected_post_id = 0
+        self.load_posts()
+
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -150,5 +180,11 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         # 鼠标左键点击事件
         self.tvWords.clicked.connect(self.tvWords_left_click)
 
-
         self.btn_words_save.clicked.connect(self.tvWords_save)
+
+        self.tabWidget.currentChanged['int'].connect(self.tab_changed) 
+        self.tlwPost.clicked.connect(self.selected_post)
+
+        self.btn_post_delete.clicked.connect(self.delete_post_node)
+
+        self.load_posts()

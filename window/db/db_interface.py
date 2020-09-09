@@ -7,6 +7,9 @@ from db.models import PostWords
 from datetime import datetime
 
 
+from peewee import fn
+
+
 class DbInterface(object):
     def __init__(self):
         self.db = SqliteInterface()
@@ -43,6 +46,31 @@ class DbInterface(object):
         if not post_data:
             return True
         return self.db.save_post_words(post_data)
+
+    def get_posts(self):
+        return self.db.get_posts()
+
+    def get_post(self, post_id):
+        return self.db.get_post(post_id)
+
+    def get_post_word_data(self, post_id):
+        return self.db.get_post_word_data(post_id)
+
+    def get_post_words_unique(self, post_id):
+        words = self.db.get_post_words(post_id)
+        return self.db.get_post_words_count(words)
+
+    def delete_post(self, post_id):
+        return self.db.delete_post(post_id)
+
+    def delete_post_words(self, post_id):
+        return self.db.delete_post_words(post_id)
+
+    def delete_behavior(self, words):
+        return self.db.delete_behavior(delete_behavior)
+
+    def delete_word_list(self, words):
+        return self.db.delete_word_list(words)
 
 
 class SqliteInterface(object):
@@ -98,3 +126,95 @@ class SqliteInterface(object):
 
     def save_post_words(self, post_data):
         return PostWords.insert_many(post_data).execute()
+
+    def get_posts(self):
+        query = Post.select(
+            Post.id,
+            Post.title,
+            Post.url,
+        ).order_by(Post.create_at.desc())
+        post_list = []
+        for row in query:
+            post_list.append({
+                'id': row.id,
+                'title': row.title,
+                'url': row.url,
+                'create_at': row.create_at,
+            })
+        return post_list
+
+    def get_post(self, post_id):
+        query = Post.select(
+            Post.id,
+            Post.title,
+            Post.url,
+            Post.create_at,
+        ).where(Post.id == post_id)
+        for row in query:
+            return {
+                "id": row.id,
+                "title": row.title,
+                "url": row.url,
+                "create_at": row.create_at,
+            }
+        return None
+
+    def get_post_word_data(self, post_id):
+        query = PostWords.select(
+            PostWords.post_id,
+            PostWords.word,
+            WordList.definition,
+            WordList.phonetic,
+            WordList.translation,
+            WordList.word,
+            WordList.word_type,
+            Behavior.word_statu
+        ).join(
+            WordList,
+            on=(PostWords.word == WordList.word)
+        ).join(
+            Behavior,
+            on=(PostWords.word == Behavior.word)
+        ).where(
+            PostWords.post_id == post_id
+        ).dicts()
+        return [row for row in query]
+
+    def get_post_words(self, post_id):
+        query = PostWords.select(
+            PostWords.word
+        ).where(
+            PostWords.post_id == post_id
+        )
+        return [row.word for row in query]
+
+    def get_post_words_count(self, words):
+        query = PostWords.select(
+            PostWords.word
+        ).where(
+            PostWords.word.in_(words)
+        ).group_by(
+            PostWords.word
+        ).having(fn.Count(PostWords.word) == 1)
+        print(query)
+        return [row.word for row in query]
+
+    def delete_post(self, post_id):
+        query = Post.delete().where(
+            Post.id == post_id
+        ).execute()
+
+    def delete_post_words(self, post_id):
+        PostWords.delete().where(
+            PostWords.post_id == post_id
+        ).execute()
+
+    def delete_behavior(self, words):
+        Behavior.delete().where(
+            Behavior.word.in_(words)
+        ).execute()
+
+    def delete_word_list(self, words):
+        WordList.delete().where(
+            WordList.word.in_(words)
+        ).execute()

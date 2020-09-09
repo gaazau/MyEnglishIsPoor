@@ -20,19 +20,34 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(906, 880)
+        MainWindow.resize(1045, 863)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setSpacing(0)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_7 = QVBoxLayout(self.centralwidget)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
         self.tab_op = QWidget()
         self.tab_op.setObjectName(u"tab_op")
-        self.verticalLayout_7 = QVBoxLayout(self.tab_op)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_8 = QVBoxLayout(self.tab_op)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.tlwPost = QListWidget(self.tab_op)
+        self.tlwPost.setObjectName(u"tlwPost")
+
+        self.verticalLayout.addWidget(self.tlwPost)
+
+        self.btn_post_delete = QPushButton(self.tab_op)
+        self.btn_post_delete.setObjectName(u"btn_post_delete")
+
+        self.verticalLayout.addWidget(self.btn_post_delete)
+
+
+        self.horizontalLayout.addLayout(self.verticalLayout)
+
         self.verticalLayout_6 = QVBoxLayout()
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.groupBox_2 = QGroupBox(self.tab_op)
@@ -78,7 +93,12 @@ class Ui_MainWindow(object):
         self.verticalLayout_6.addWidget(self.txtPost)
 
 
-        self.verticalLayout_7.addLayout(self.verticalLayout_6)
+        self.horizontalLayout.addLayout(self.verticalLayout_6)
+
+        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(1, 4)
+
+        self.verticalLayout_8.addLayout(self.horizontalLayout)
 
         self.groupBox = QGroupBox(self.tab_op)
         self.groupBox.setObjectName(u"groupBox")
@@ -95,7 +115,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.addWidget(self.btnCreate)
 
 
-        self.verticalLayout_7.addWidget(self.groupBox)
+        self.verticalLayout_8.addWidget(self.groupBox)
 
         self.tabWidget.addTab(self.tab_op, "")
         self.tab_words = QWidget()
@@ -155,7 +175,7 @@ class Ui_MainWindow(object):
 
         self.tabWidget.addTab(self.tab_grammer, "")
 
-        self.verticalLayout.addWidget(self.tabWidget)
+        self.verticalLayout_7.addWidget(self.tabWidget)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QStatusBar(MainWindow)
@@ -172,6 +192,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.btn_post_delete.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u8be6\u7ec6\u4fe1\u606f", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u6807\u9898:", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"URL: ", None))
