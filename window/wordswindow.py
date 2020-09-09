@@ -19,6 +19,8 @@ from PySide2 import QtWidgets
 from PySide2 import QtGui
 from PySide2 import QtCore
 
+from db.db_interface import DbInterface
+
 
 class WordsListModel(QtCore.QAbstractTableModel):
     def __init__(self, parent, mylist, header, *args):
@@ -71,7 +73,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def CreateWords(self):
         origin_words = Views().extract_english_words(self.txtPost.toPlainText())
-        stop_words = []
+        stop_words = DbInterface().get_stop_words()
         clean_words = Views().exclude_stop_words(origin_words, stop_words)
         if not clean_words:
             return
