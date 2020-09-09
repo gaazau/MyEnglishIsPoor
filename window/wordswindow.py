@@ -13,13 +13,13 @@ from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
 
 from core.views import Views
 
-
 import operator
 from PySide2 import QtWidgets
 from PySide2 import QtGui
 from PySide2 import QtCore
 
 from db.db_interface import DbInterface
+import global_data
 
 
 class WordsListModel(QtCore.QAbstractTableModel):
@@ -55,6 +55,7 @@ class WordsListModel(QtCore.QAbstractTableModel):
             self.mylist.reverse()
         self.emit(QtCore.SIGNAL("layoutChanged()"))
 
+
 class WordsWindow(QMainWindow, Ui_MainWindow):
     """A window to show the books available"""
 
@@ -73,22 +74,34 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def CreateWords(self):
         origin_words = Views().extract_english_words(self.txtPost.toPlainText())
+        if not origin_words:
+                return
         stop_words = DbInterface().get_stop_words()
         clean_words = Views().exclude_stop_words(origin_words, stop_words)
         if not clean_words:
             return
-        data_list = []
-        header = ['单词', '英文定义', '中文定义', '发音', '词性分类']
+        star_words_dict = DbInterface().get_words_detail(clean_words)
+        global_data.word_list_data = [] 
+        header = ['单词', '中文定义', '发音', '英文定义', '词性分类']
         for word in clean_words:
-            row = ['', '', '', '', '']
-            row[0] = str(word)
-            data_list.append(row)
+            row = [str(word), '', '', '', '']
+            detail = star_words_dict.get(str(word).lower(), {})
+            if detail:
+                row[1] = detail['translation']
+                row[2] = detail['phonetic']
+                row[3] = detail['definition']
+            global_data.word_list_data.append(row)
         
-        self.tvWords.setModel(WordsListModel(self, data_list, header))
-        # set column width to fit contents (set font first!)
-        self.tvWords.resizeColumnsToContents()
+        self.tvWords.setModel(WordsListModel(self, global_data.word_list_data, header))
+        self.tvWords.setWordWrap(True)
+        self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tabWidget.setCurrentIndex(1)
 
+
+    def tvWords_left_click(self, item):
+        if item.column() == 0 and item.row()>=0:
+            print(global_data.word_list_data[item.row()])
 
     def __init__(self):
         QMainWindow.__init__(self)
@@ -96,3 +109,5 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
         self.btnLoad.clicked.connect(self.LoadFile)
         self.btnCreate.clicked.connect(self.CreateWords)
+        # 鼠标左键点击事件
+        self.tvWords.clicked.connect(self.tvWords_left_click)
