@@ -57,5 +57,5 @@ class Views(object):
                 })
         DbInterface().save_word_list(word_data)
         DbInterface().save_behavior(behavior_data)
-        DbInterface().save_stop_words(sorted(stop_word_data))
+        DbInterface().save_stop_words(stop_word_data)
         return True

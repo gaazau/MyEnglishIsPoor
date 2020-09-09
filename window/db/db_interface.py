@@ -16,16 +16,22 @@ class DbInterface(object):
         star_word_dict = self.db.get_words_detail(words)
         return star_word_dict
 
-    def save_word_list(self, words_list_to_save):
-        return self.db.save_word_list(words_list_to_save)
+    def save_word_list(self, word_data):
+        if not word_data:
+            return True
+        return self.db.save_word_list(word_data)
 
     def get_done_word_list(self, word_list):
         return self.db.get_done_word_list(word_list)
 
     def save_behavior(self, behavior_data):
+        if not behavior_data:
+            return True
         return self.db.save_behavior(behavior_data)
 
     def save_stop_words(self, stop_word_data):
+        if not stop_word_data:
+            return True
         return self.db.save_stop_words(stop_word_data)
 
 
@@ -54,7 +60,7 @@ class SqliteInterface(object):
         return words_dict
 
     def save_word_list(self, words_list):
-        query = WordList.insert_many(words_list).execute()
+        query = WordList.insert_many(words_list).on_conflict('replace').execute()
         return query > 0
 
     def get_done_word_list(self, word_list):
@@ -67,9 +73,9 @@ class SqliteInterface(object):
         return [row.word for row in query]
 
     def save_behavior(self, behavior_data):
-        query = Behavior.insert_many(behavior_data).execute()
+        query = Behavior.insert_many(behavior_data).on_conflict('replace').execute()
         return query > 0
 
     def save_stop_words(self, stop_word_data):
-        query = Behavior.insert_many(stop_word_data).execute()
+        query = StopWords.insert_many(stop_word_data).on_conflict('replace').execute()
         return query > 0

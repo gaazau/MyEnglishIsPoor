@@ -86,7 +86,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QPushButton" name="btn_words_save">
             <property name="text">
-             <string>保存</string>
+             <string>更新状态</string>
             </property>
            </widget>
           </item>
