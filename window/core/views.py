@@ -48,12 +48,7 @@ class Views(object):
         return True
 
     def get_post_words(self, txt_post):
-        origin_words = self.extract_english_words(txt_post)
-        if not origin_words:
-            return []
-        stop_words = DbInterface().get_stop_words()
-        clean_words = self.exclude_stop_words(origin_words, stop_words)
-        return clean_words
+        return self.extract_english_words(txt_post)
 
 
 class GlobalData():
@@ -64,6 +59,7 @@ class GlobalData():
         'word_dict': {}
     }
     behavior_dict = {}
+    words_filter_mode = 0 
 
     @classmethod
     def reset_data(cls):
@@ -89,7 +85,7 @@ class GlobalData():
         return cls.selected_post
 
     @classmethod
-    def create_post_words(cls, txt_post=""):
+    def get_post_words(cls, txt_post=""):
         # 选中文章对应单词列表(全)
         if not txt_post:
             cls.post_data['word_list'] = DbInterface(
@@ -117,6 +113,7 @@ class GlobalData():
         # 0: 未读 1：已读 2：停用
         cls.behavior_dict = DbInterface().get_words_behavior(
             cls.post_data['word_list'])
+        print("db_behavior:",  cls.behavior_dict)
         for word in cls.post_data['word_list']:
             if word in cls.behavior_dict:
                 continue
@@ -128,6 +125,7 @@ class GlobalData():
                 # 单词无定义，视为可停用
                 statu = 2
             cls.behavior_dict[word] = statu
+        print("gb_behavior:",  cls.behavior_dict)
         return cls.behavior_dict
 
     @classmethod

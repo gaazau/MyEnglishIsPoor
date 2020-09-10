@@ -124,24 +124,29 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.layout = QHBoxLayout()
         self.layout.setObjectName(u"layout")
-        self.btn_words_save = QPushButton(self.tab_words)
-        self.btn_words_save.setObjectName(u"btn_words_save")
-
-        self.layout.addWidget(self.btn_words_save)
-
-        self.pushButton = QPushButton(self.tab_words)
-        self.pushButton.setObjectName(u"pushButton")
-
-        self.layout.addWidget(self.pushButton)
-
 
         self.verticalLayout_3.addLayout(self.layout)
+
+        self.cb_filter_words = QComboBox(self.tab_words)
+        self.cb_filter_words.addItem("")
+        self.cb_filter_words.addItem("")
+        self.cb_filter_words.addItem("")
+        self.cb_filter_words.addItem("")
+        self.cb_filter_words.addItem("")
+        self.cb_filter_words.setObjectName(u"cb_filter_words")
+
+        self.verticalLayout_3.addWidget(self.cb_filter_words)
 
         self.tvWords = QTableView(self.tab_words)
         self.tvWords.setObjectName(u"tvWords")
         self.tvWords.setSortingEnabled(True)
 
         self.verticalLayout_3.addWidget(self.tvWords)
+
+        self.btn_words_save = QPushButton(self.tab_words)
+        self.btn_words_save.setObjectName(u"btn_words_save")
+
+        self.verticalLayout_3.addWidget(self.btn_words_save)
 
         self.tabWidget.addTab(self.tab_words, "")
         self.tab_phrase = QWidget()
@@ -184,7 +189,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -205,8 +210,13 @@ class Ui_MainWindow(object):
         self.btnLoad.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u6587\u4ef6", None))
         self.btnCreate.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_op), QCoreApplication.translate("MainWindow", u"\u6587\u7ae0\u64cd\u4f5c", None))
+        self.cb_filter_words.setItemText(0, QCoreApplication.translate("MainWindow", u"\u5168\u90e8", None))
+        self.cb_filter_words.setItemText(1, QCoreApplication.translate("MainWindow", u"\u4ec5\u672a\u8bfb", None))
+        self.cb_filter_words.setItemText(2, QCoreApplication.translate("MainWindow", u"\u4ec5\u5df2\u8bfb", None))
+        self.cb_filter_words.setItemText(3, QCoreApplication.translate("MainWindow", u"\u672a\u8bfb+\u5df2\u8bfb", None))
+        self.cb_filter_words.setItemText(4, QCoreApplication.translate("MainWindow", u"\u4ec5\u505c\u7528", None))
+
         self.btn_words_save.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0\u72b6\u6001", None))
-        self.pushButton.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_words), QCoreApplication.translate("MainWindow", u"\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_phrase), QCoreApplication.translate("MainWindow", u"\u77ed\u8bed\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_grammer), QCoreApplication.translate("MainWindow", u"\u53e5\u578b\u672c", None))

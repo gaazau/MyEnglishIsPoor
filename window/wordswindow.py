@@ -19,7 +19,6 @@ from PySide2 import QtGui
 from PySide2 import QtCore
 
 from db.db_interface import DbInterface
-import global_data
 from core.views import GlobalData
 
 from copy import deepcopy
@@ -92,7 +91,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.currentChanged['int'].connect(self.tab_changed)
         self.tlwPost.clicked.connect(self.selected_post)
         self.btn_post_delete.clicked.connect(self.delete_post_node)
+        self.cb_filter_words.currentIndexChanged.connect(
+            self.change_filter_mode)
 
+        self.cb_filter_words.setCurrentIndex(1)
         GlobalData.reset_data()
         self.load_posts()
 
@@ -123,7 +125,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 url=post_data['url'],
                 data="\n".join([row['word'] for row in post_words]),
             )
-            words = GlobalData.create_post_words(self.txtPost.toPlainText())
+            words = GlobalData.get_post_words(self.txtPost.toPlainText())
             GlobalData.init_behavior_dict()
             self.refresh_control_word_list()
 
@@ -186,12 +188,12 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             self.le_url.text(),
             "\n".join([word for word in words])
         )
-        self.refresh_control_word_list(filter_mode="unread")
+        self.refresh_control_word_list()
         self.tabWidget.setCurrentIndex(1)
 
-    def refresh_control_word_list(self, filter_mode="unread"):
+    def refresh_control_word_list(self):
         """刷新单词表控件"""
-        filter_words = self.filter_word_list(filter_mode)
+        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
         word_list_shown = GlobalData.get_word_list_shown(filter_words)
         model = WordsListModel(
             self, word_list_shown, GlobalData.word_list_header, GlobalData.behavior_dict)
@@ -199,15 +201,27 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
-    def filter_word_list(self, filter_mode="all"):
-        """单词过滤"""
-        if filter_mode == "unread":
-            filter_words = []
-            for word in GlobalData.post_data['word_list']:
-                if GlobalData.behavior_dict[word] == 0:
-                    filter_words.append(word)
-            return filter_words
-        return deepcopy(GlobalData.post_data['word_list'])
+    def filter_word_list(self, filter_mode=0):
+        """单词过滤
+
+        0:全部 1:仅未读 2:仅已读 3:未读+已读 4:仅停用
+        """
+        filter_mode_dict = {
+            0: (0, 1, 2),
+            1: (0,),
+            2: (1,),
+            3: (0, 1),
+            4: (2,),
+        }
+        filter_words = []
+
+        for word in GlobalData.post_data['word_list']:
+            if GlobalData.behavior_dict[word] in filter_mode_dict.get(filter_mode, 0):
+                filter_words.append(word)
+        print("behavior_dict:", GlobalData.behavior_dict)
+        print("#######")
+        print("filter_words:", filter_words)
+        return filter_words
 
     @Slot()
     def tvWords_left_click(self, item):
@@ -222,4 +236,12 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         word_list = GlobalData.word_list_to_db()
         behavior_list = GlobalData.behavior_list_to_db()
         Views().update_word_list(word_list, behavior_list)
-        self.refresh_control_word_list(filter_mode="unread")
+        self.refresh_control_word_list()
+
+    @Slot()
+    def change_filter_mode(self, index):
+        if not index:
+            GlobalData.words_filter_mode = 0
+        else:
+            GlobalData.words_filter_mode = index
+        self.refresh_control_word_list()
