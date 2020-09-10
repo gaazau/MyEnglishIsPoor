@@ -1,6 +1,5 @@
 from db.models import Behavior
 from db.models import Post
-from db.models import StopWords
 from db.models import WordList
 from db.models import Stardict
 from db.models import PostWords
@@ -25,9 +24,6 @@ class DbInterface(object):
         if not word_data:
             return True
         return self.db.save_word_list(word_data)
-
-    def get_done_word_list(self, word_list):
-        return self.db.get_done_word_list(word_list)
 
     def save_behavior(self, behavior_data):
         if not behavior_data:
@@ -72,12 +68,15 @@ class DbInterface(object):
     def delete_word_list(self, words):
         return self.db.delete_word_list(words)
 
+    def get_words_behavior(self, words):
+        return self.db.get_words_behavior(words)
 
 class SqliteInterface(object):
     def get_stop_words(self):
-        query = StopWords.select(StopWords.word)
-        stop_words = [row.word for row in query]
-        return stop_words
+        query = Behavior.select(
+            Behavior.word
+        ).where(Behavior.word_statu==2)
+        return [row.word for row in query]
 
     def get_words_detail(self, words):
         query = Stardict.select(
@@ -102,23 +101,9 @@ class SqliteInterface(object):
             words_list).on_conflict('replace').execute()
         return query > 0
 
-    def get_done_word_list(self, word_list):
-        query = WordList.select(
-            WordList.word
-        ).join(
-            Behavior,
-            on=(Behavior.word == WordList.word)
-        ).where(WordList.word.in_(word_list), Behavior.word_statu > 0)
-        return [row.word for row in query]
-
     def save_behavior(self, behavior_data):
         query = Behavior.insert_many(
             behavior_data).on_conflict('replace').execute()
-        return query > 0
-
-    def save_stop_words(self, stop_word_data):
-        query = StopWords.insert_many(
-            stop_word_data).on_conflict('replace').execute()
         return query > 0
 
     def save_post(self, title, url, post_hash):
@@ -218,3 +203,10 @@ class SqliteInterface(object):
         WordList.delete().where(
             WordList.word.in_(words)
         ).execute()
+
+    def get_words_behavior(self, words):
+        query = Behavior.select(
+            Behavior.word,
+            Behavior.word_statu,
+        ).where(Behavior.word.in_(words)).dicts()
+        return {row['word']: row['word_statu'] for row in query}

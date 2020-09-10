@@ -20,16 +20,18 @@ from PySide2 import QtCore
 
 from db.db_interface import DbInterface
 import global_data
+from core.views import GlobalData
 
 from copy import deepcopy
 import settings
 
 
 class WordsListModel(QtCore.QAbstractTableModel):
-    def __init__(self, parent, mylist, header, *args):
+    def __init__(self, parent, mylist, header, behavior_dict, *args):
         QtCore.QAbstractTableModel.__init__(self, parent, *args)
         self.mylist = mylist
         self.header = header
+        self.behavior_dict = behavior_dict
 
     def rowCount(self, parent):
         return len(self.mylist)
@@ -47,8 +49,8 @@ class WordsListModel(QtCore.QAbstractTableModel):
         elif role == QtCore.Qt.DisplayRole:
             return self.mylist[index.row()][index.column()]
         elif role == Qt.BackgroundRole:
-            if index.column() == 0 and global_data.behavior_data:
-                statu = global_data.behavior_data[index.row()]
+            if index.column() == 0 and self.behavior_dict:
+                statu = self.behavior_dict[self.mylist[index.row()][index.column()]]
                 color = Qt.white
                 if statu == 1:
                     color = Qt.green
@@ -76,139 +78,125 @@ class WordsListModel(QtCore.QAbstractTableModel):
 
 class WordsWindow(QMainWindow, Ui_MainWindow):
     """A window to show the books available"""
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setupUi(self)
 
-    @Slot()
-    def LoadFile(self):
-        path = QFileDialog.getOpenFileName(self, "Open File",
-                                           '', "Any Files (*.*)")
+        # 注册事件
+        self.btnLoad.clicked.connect(self.load_file)
+        self.btnCreate.clicked.connect(self.create_word_list)
+        self.tvWords.clicked.connect(self.tvWords_left_click)
+        self.btn_words_save.clicked.connect(self.update_word_list)
+        self.tabWidget.currentChanged['int'].connect(self.tab_changed)
+        self.tlwPost.clicked.connect(self.selected_post)
+        self.btn_post_delete.clicked.connect(self.delete_post_node)
 
-        if path:
-            inFile = QFile(path[0])
-            if inFile.open(QFile.ReadOnly | QFile.Text):
-                text = inFile.readAll()
-                text = str(text, encoding='utf8')
-                self.txtPost.setPlainText(text)
-                _, filename = os.path.split(inFile.fileName())
-                self.le_title.setText(str(filename))
-
-    @Slot()
-    def CreateWords(self):
-        origin_words = Views().extract_english_words(self.txtPost.toPlainText())
-        if not origin_words:
-            self.init_data()
-            self.tvWords.setModel(WordsListModel(
-                self, [], global_data.word_list_header))
-            return
-        stop_words = DbInterface().get_stop_words()
-        clean_words = Views().exclude_stop_words(origin_words, stop_words)
-        clean_words = Views().filter_done_words(clean_words)
-        if not clean_words:
-            return
-        word_type_dict = Views().get_word_type_dict(clean_words)
-        star_words_dict = DbInterface().get_words_detail(clean_words)
-        global_data.word_list_data = []
-        global_data.behavior_data = []
-        for word in clean_words:
-            row = [str(word), '', '', '', '']
-            detail = star_words_dict.get(str(word).lower(), {})
-            if detail:
-                row[1] = detail['translation']
-                row[2] = detail['phonetic']
-                row[3] = detail['definition']
-                row[4] = word_type_dict.get(str(word), '')
-            global_data.word_list_data.append(row)
-
-            # 0:未读 1：已读  2：停用
-            behavior_statu = 0
-            if not detail:
-                behavior_statu = 2
-            global_data.behavior_data.append(behavior_statu)
-
-        word_list = deepcopy(global_data.word_list_data)
-        for word in word_list:
-            word[4] = settings.NLTK_WORD_TYPE_DICT.get(word[4], '')
-
-        self.tvWords.setModel(WordsListModel(
-            self, word_list, global_data.word_list_header))
-
-        global_data.post_data = {
-            "title": self.le_title.text(),
-            "url": self.le_url.text()
-        }
-
-        self.tvWords.setWordWrap(True)
-        self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tabWidget.setCurrentIndex(1)
-
-    def tvWords_left_click(self, item):
-        if item.column() == 0 and item.row() >= 0:
-            statu = global_data.behavior_data[item.row()]
-            global_data.behavior_data[item.row()] = (statu + 1) % 3
-
-    @Slot()
-    def tvWords_save(self):
-        Views().save_word_list(
-            global_data.word_list_data,
-            global_data.behavior_data,
-            global_data.post_data
-        )
+        self.load_posts()
 
     def load_posts(self):
+        """加载文章列表"""
         self.tlwPost.clear()
-        global_data.post_list = DbInterface().get_posts()
+        posts = DbInterface().get_posts()
         post_list = [str(row['id']) + ":" + str(row['title'])
-                     for row in global_data.post_list]
+                     for row in posts]
         self.tlwPost.addItems(post_list)
 
     @Slot()
     def tab_changed(self, index):
+        """tab页切换"""
         if index == 0:
             self.load_posts()
 
     @Slot()
     def selected_post(self, item):
+        """选中文章节点"""
         post_id = int(str(item.data()).split(":")[0])
         if post_id:
-            global_data.selected_post_id = post_id
             post_data = DbInterface().get_post(post_id)
-            global_data.post_word_data = DbInterface().get_post_word_data(post_id)
-            if not post_data:
-                return
-            self.le_title.setText(post_data['title'])
-            self.le_url.setText(post_data['url'])
-            self.txtPost.setPlainText(
-                "\n".join([row['word'] for row in global_data.post_word_data]))
-
+            self.refresh_control_post(
+                    post_id=0,
+                    title=post_data['title'],
+                    url=post_data['url'],
+                    data="\n".join([row['word'] for row in post_words]),
+            )
+    @Slot()        
     def delete_post_node(self):
-        if not global_data.selected_post_id:
+        """删除文章节点"""
+        if not GlobalData.selected_post['post_id']:
             return
-        Views().delete_post_words(global_data.selected_post_id)
-        global_data.selected_post_id = 0
+        Views().delete_post_words(GlobalData.selected_post['post_id'])
+        self.refresh_control_post()
         self.load_posts()
+        
+    @Slot()
+    def load_file(self):
+        """加载外部文件获取文章"""
+        path = QFileDialog.getOpenFileName(
+            self, "Open File", '', "Any Files (*.*)")
+        if path:
+            inFile = QFile(path[0])
+            if inFile.open(QFile.ReadOnly | QFile.Text):
+                text = str(inFile.readAll(), encoding='utf8')
+                self.txtPost.setPlainText(text)
+                _, filename = os.path.split(inFile.fileName())
+                self.le_title.setText(str(filename))
+                self.refresh_control_post(
+                    post_id=0,
+                    title=filename,
+                    url="",
+                    data=text,
+                )
 
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.setupUi(self)
+    def refresh_control_post(self, post_id=0, title="", url="", data=""):
+        """刷新文章控件内容"""
+        self.le_title.setText(title)
+        self.le_url.setText(url)
+        self.txtPost.setText(data)
+        GlobalData.set_selected_post(
+                post_id=post_id,
+                title=title,
+                url=url,
+            )
+    @Slot()
+    def create_word_list(self):
+        """创建文章对应单词表，过滤得到所有未读单词"""
+        GlobalData.create_post_words_full(self.txtPost.toPlainText())
+        GlobalData.init_behavior_dict()
+        self.refresh_control_word_list(filter_mode="unread")
+        self.tabWidget.setCurrentIndex(1)
 
-        self.btnLoad.clicked.connect(self.LoadFile)
-        self.btnCreate.clicked.connect(self.CreateWords)
-        # 鼠标左键点击事件
-        self.tvWords.clicked.connect(self.tvWords_left_click)
+    def refresh_control_word_list(self, filter_mode="unread"):
+        """刷新单词表控件"""
+        filter_words = self.filter_word_list(filter_mode)
+        word_list_shown = GlobalData.get_word_list_shown(filter_words)
+        model = WordsListModel(self, word_list_shown, GlobalData.word_list_header, GlobalData.behavior_dict)
+        self.tvWords.setModel(model)
+        self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+    
+    def filter_word_list(self, filter_mode="all"):
+        """单词过滤"""
+        if filter_mode == "unread":
+            filter_words = []
+            for word in GlobalData.post_data['word_list']:
+                if GlobalData.behavior_dict[word] == 0:
+                    filter_words.append(word)
+            return filter_words
+        return deepcopy(GlobalData.post_data['word_list'])
 
-        self.btn_words_save.clicked.connect(self.tvWords_save)
+    @Slot()
+    def tvWords_left_click(self, item):
+        """单词点击，修改单词已读未读状态"""
+        if item.column() == 0 and item.row() >= 0:
+            statu = GlobalData.behavior_dict[item.data()]
+            GlobalData.behavior_dict[item.data()] = (statu + 1) % 3
 
-        self.tabWidget.currentChanged['int'].connect(self.tab_changed)
-        self.tlwPost.clicked.connect(self.selected_post)
-
-        self.btn_post_delete.clicked.connect(self.delete_post_node)
-
-        self.load_posts()
-
-    def init_data(self):
-        global_data.word_list_data = []
-        global_data.behavior_data = []
-        global_data.post_data = {}
-        global_data.post_list = []
-        global_data.post_word_data = []
-        global_data.selected_post_id = 0
+    @Slot()
+    def update_word_list(self):
+        """更新单词表当前状态"""
+        post_id = Views().save_word_list(
+            # GlobalData.word,
+            global_data.word_list_data,
+            global_data.behavior_data,
+            global_data.post_data
+        )

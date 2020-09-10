@@ -36,12 +36,6 @@ class PostWords(BaseModel):
         primary_key = CompositeKey('post_id', 'word')
 
 
-class StopWords(BaseModel):
-    word = TextField(constraints=[SQL("DEFAULT ''")], unique=True)
-
-    class Meta:
-        table_name = 'stop_words'
-
 class WordList(BaseModel):
     definition = IntegerField(constraints=[SQL("DEFAULT ''")])
     phonetic = IntegerField(constraints=[SQL("DEFAULT ''")])
