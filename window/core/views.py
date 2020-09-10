@@ -31,7 +31,7 @@ class Views(object):
             tags_dict[tag[0]] = tag[1]
         return tags_dict
 
-    def save_word_list(self, word_list, behavior_list, post_dict):
+    def update_word_list(self, word_list, behavior_list, post_dict):
         word_data = []
         behavior_data = []
         stop_word_data = []
@@ -139,7 +139,7 @@ class GlobalData():
                 'definition': detail.get('definition', ''),
                 'word_type': word_type_dict.get(str(word), ''),
             }
-        return cls.selected_post.get('post_id', 0)
+        return cls.post_data['word_list']
 
     @classmethod
     def init_behavior_dict(cls):

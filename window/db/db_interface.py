@@ -35,8 +35,12 @@ class DbInterface(object):
             return True
         return self.db.save_stop_words(stop_word_data)
 
-    def save_post(self, title, url, post_hash):
-        return self.db.save_post(title, url, post_hash)
+    def create_or_update_post(self, post_id, title, url):
+        if not post_id:
+            post_id = self.db.save_post(title, url)
+        else:
+            self.db.update_post(post_id, title, url)
+        return post_id
 
     def save_post_words(self, post_data):
         if not post_data:
@@ -71,11 +75,21 @@ class DbInterface(object):
     def get_words_behavior(self, words):
         return self.db.get_words_behavior(words)
 
+    def create_or_update_post_words(self, post_id, words):
+        post_data = []
+        for word in words:
+            post_data.append({
+                'post_id': post_id,
+                'word': word,
+            })
+        self.db.save_post_words(post_data)
+        return True
+
 class SqliteInterface(object):
     def get_stop_words(self):
         query = Behavior.select(
             Behavior.word
-        ).where(Behavior.word_statu==2)
+        ).where(Behavior.word_statu == 2)
         return [row.word for row in query]
 
     def get_words_detail(self, words):
@@ -106,11 +120,17 @@ class SqliteInterface(object):
             behavior_data).on_conflict('replace').execute()
         return query > 0
 
-    def save_post(self, title, url, post_hash):
-        return Post.insert(title=title, url=url, post_hash=post_hash, create_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')).execute()
+    def save_post(self, title, url):
+        return Post.insert(title=title, url=url, create_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S')).execute()
+
+    def update_post(self, post_id, title, url):
+        Post.update(
+            title=title,
+            url=url
+        ).where(post_id == post_id).execute()
 
     def save_post_words(self, post_data):
-        return PostWords.insert_many(post_data).execute()
+        return PostWords.insert_many(post_data).on_conflict('replace').execute()
 
     def get_posts(self):
         query = Post.select(
@@ -148,18 +168,6 @@ class SqliteInterface(object):
         query = PostWords.select(
             PostWords.post_id,
             PostWords.word,
-            WordList.definition,
-            WordList.phonetic,
-            WordList.translation,
-            WordList.word,
-            WordList.word_type,
-            Behavior.word_statu
-        ).join(
-            WordList,
-            on=(PostWords.word == WordList.word)
-        ).join(
-            Behavior,
-            on=(PostWords.word == Behavior.word)
         ).where(
             PostWords.post_id == post_id
         ).dicts()

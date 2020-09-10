@@ -113,8 +113,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         post_id = int(str(item.data()).split(":")[0])
         if post_id:
             post_data = DbInterface().get_post(post_id)
+            post_words = DbInterface().get_post_word_data(post_id)
+            print(post_words)
             self.refresh_control_post(
-                    post_id=0,
+                    post_id=post_id,
                     title=post_data['title'],
                     url=post_data['url'],
                     data="\n".join([row['word'] for row in post_words]),
@@ -160,8 +162,20 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def create_word_list(self):
         """创建文章对应单词表，过滤得到所有未读单词"""
-        GlobalData.create_post_words_full(self.txtPost.toPlainText())
+        post_id = DbInterface().create_or_update_post(
+            post_id=GlobalData.selected_post['post_id'],
+            title=self.le_title.text(),
+            url=self.le_url.text()
+        )
+        words = GlobalData.create_post_words_full(self.txtPost.toPlainText())
+        DbInterface().create_or_update_post_words(post_id, words)
         GlobalData.init_behavior_dict()
+        self.refresh_control_post(
+            post_id,
+            self.le_title.text(), 
+            self.le_url.text(), 
+            "\n".join([word for word in words])
+        )
         self.refresh_control_word_list(filter_mode="unread")
         self.tabWidget.setCurrentIndex(1)
 
@@ -194,9 +208,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def update_word_list(self):
         """更新单词表当前状态"""
-        post_id = Views().save_word_list(
+        post_id = Views().update_word_list(
             # GlobalData.word,
             global_data.word_list_data,
             global_data.behavior_data,
             global_data.post_data
         )
+        self.refresh_control_word_list(filter_mode="unread")
