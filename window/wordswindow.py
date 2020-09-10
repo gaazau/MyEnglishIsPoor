@@ -175,7 +175,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             title=self.le_title.text(),
             url=self.le_url.text()
         )
-        words = GlobalData.create_post_words(self.txtPost.toPlainText())
+        words = GlobalData.get_post_words(self.txtPost.toPlainText())
         GlobalData.init_behavior_dict()
 
         DbInterface().save_word_list(GlobalData.word_list_to_db())
