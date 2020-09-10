@@ -114,20 +114,24 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         if post_id:
             post_data = DbInterface().get_post(post_id)
             post_words = DbInterface().get_post_word_data(post_id)
-            print(post_words)
             self.refresh_control_post(
                     post_id=post_id,
                     title=post_data['title'],
                     url=post_data['url'],
                     data="\n".join([row['word'] for row in post_words]),
             )
+            words = GlobalData.create_post_words(self.txtPost.toPlainText())
+            GlobalData.init_behavior_dict()
+            self.refresh_control_word_list()
     @Slot()        
     def delete_post_node(self):
         """删除文章节点"""
         if not GlobalData.selected_post['post_id']:
             return
         Views().delete_post_words(GlobalData.selected_post['post_id'])
+        GlobalData.reset_data()
         self.refresh_control_post()
+        self.refresh_control_word_list()
         self.load_posts()
         
     @Slot()
@@ -139,9 +143,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             inFile = QFile(path[0])
             if inFile.open(QFile.ReadOnly | QFile.Text):
                 text = str(inFile.readAll(), encoding='utf8')
-                self.txtPost.setPlainText(text)
                 _, filename = os.path.split(inFile.fileName())
-                self.le_title.setText(str(filename))
                 self.refresh_control_post(
                     post_id=0,
                     title=filename,
@@ -162,14 +164,17 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def create_word_list(self):
         """创建文章对应单词表，过滤得到所有未读单词"""
-        post_id = DbInterface().create_or_update_post(
-            post_id=GlobalData.selected_post['post_id'],
+        post_id = DbInterface().create_post(
             title=self.le_title.text(),
             url=self.le_url.text()
         )
-        words = GlobalData.create_post_words_full(self.txtPost.toPlainText())
-        DbInterface().create_or_update_post_words(post_id, words)
+        words = GlobalData.create_post_words(self.txtPost.toPlainText())
         GlobalData.init_behavior_dict()
+
+        DbInterface().save_word_list(GlobalData.word_list_to_db())
+        DbInterface().create_or_update_post_words(post_id, words)
+        DbInterface().save_behavior(GlobalData.behavior_list_to_db())
+
         self.refresh_control_post(
             post_id,
             self.le_title.text(), 
@@ -208,10 +213,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     @Slot()
     def update_word_list(self):
         """更新单词表当前状态"""
-        post_id = Views().update_word_list(
-            # GlobalData.word,
-            global_data.word_list_data,
-            global_data.behavior_data,
-            global_data.post_data
-        )
+        word_list = GlobalData.word_list_to_db()
+        behavior_list = GlobalData.behavior_list_to_db()
+        Views().update_word_list(word_list, behavior_list)
         self.refresh_control_word_list(filter_mode="unread")

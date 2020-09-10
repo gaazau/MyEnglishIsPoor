@@ -31,46 +31,11 @@ class Views(object):
             tags_dict[tag[0]] = tag[1]
         return tags_dict
 
-    def update_word_list(self, word_list, behavior_list, post_dict):
-        word_data = []
-        behavior_data = []
-        stop_word_data = []
-        for i, row in enumerate(word_list):
-            if 0 <= behavior_list[i] < 2:
-                word_data.append({
-                    'word': row[0],
-                    'translation': row[1],
-                    'phonetic': row[2],
-                    'definition': row[3],
-                    'word_type': row[4],
-                })
-                behavior_data.append({
-                    'word': row[0],
-                    'word_statu': behavior_list[i],
-                })
-            else:
-                stop_word_data.append({
-                    'word': row[0]
-                })
-        DbInterface().save_word_list(word_data)
-        DbInterface().save_behavior(behavior_data)
-        DbInterface().save_stop_words(stop_word_data)
-        try:
-            post_words = "\n".join(sorted({row['word'] for row in word_data}))
-            post_id = DbInterface().save_post(
-                post_dict['title'], post_dict['url'], str(hash(post_words)))
-        except Exception:
-            post_id = None
-        if post_id:
-            post_data = []
-            for row in word_data:
-                post_data.append({
-                    'post_id': post_id,
-                    'word': row['word'],
-                })
-            DbInterface().save_post_words(post_data)
-        return post_id
-
+    def update_word_list(self, word_list, behavior_list):
+        DbInterface().save_word_list(word_list)
+        DbInterface().save_behavior(behavior_list)
+        return True
+    
     def delete_post_words(self, post_id):
         if not post_id:
             return True
@@ -80,6 +45,7 @@ class Views(object):
         if words:
             DbInterface().delete_behavior(words)
             DbInterface().delete_word_list(words)
+        return True
 
     def get_post_words(self, txt_post):
         origin_words = self.extract_english_words(txt_post)
@@ -100,7 +66,7 @@ class GlobalData():
     behavior_dict = {}
 
     @classmethod
-    def init_data(cls):
+    def reset_data(cls):
         cls.selected_post = {}
         cls.post_data = {
             'word_list': [],
@@ -119,7 +85,7 @@ class GlobalData():
         return cls.selected_post
 
     @classmethod
-    def create_post_words_full(cls, txt_post=""):
+    def create_post_words(cls, txt_post=""):
         # 选中文章对应单词列表(全)
         if not txt_post:
             cls.post_data['word_list'] = DbInterface(
@@ -134,6 +100,7 @@ class GlobalData():
         for word in cls.post_data['word_list']:
             detail = star_words_dict.get(str(word).lower(), {})
             cls.post_data['word_dict'][word] = {
+                'word': word,
                 'translation': detail.get('translation', ''),
                 'phonetic': detail.get('phonetic', ''),
                 'definition': detail.get('definition', ''),
@@ -172,3 +139,32 @@ class GlobalData():
                     cls.post_data['word_dict'][word]['word_type'], ''),
             ])
         return word_list
+
+    @classmethod
+    def word_list_to_db(cls):
+        return [v for v in cls.post_data['word_dict'].values()]
+
+    @classmethod
+    def behavior_list_to_db(cls):
+        behavior_list = []
+        for k, v in cls.behavior_dict.items():
+            behavior_list.append({
+                'word': k,
+                'word_statu': v
+            })
+        return behavior_list
+    
+    # @classmethod
+    # def post_dict_to_db(cls):
+    #     return cls.selected_post
+    
+    @classmethod
+    def post_words_to_db(cls):
+        post_words = []
+        if cls.selected_post['post_id']:
+            for word in cls.post_data['word_list']:
+                post_words.append({
+                    'post_id': cls.selected_post['post_id'],
+                    'word': word
+                })
+        return post_words

@@ -35,11 +35,8 @@ class DbInterface(object):
             return True
         return self.db.save_stop_words(stop_word_data)
 
-    def create_or_update_post(self, post_id, title, url):
-        if not post_id:
-            post_id = self.db.save_post(title, url)
-        else:
-            self.db.update_post(post_id, title, url)
+    def create_post(self, title, url):
+        post_id = self.db.save_post(title, url)
         return post_id
 
     def save_post_words(self, post_data):
@@ -58,7 +55,7 @@ class DbInterface(object):
 
     def get_post_words_unique(self, post_id):
         words = self.db.get_post_words(post_id)
-        return self.db.get_post_words_count(words)
+        return self.db.get_post_words_unique(words)
 
     def delete_post(self, post_id):
         return self.db.delete_post(post_id)
@@ -181,7 +178,7 @@ class SqliteInterface(object):
         )
         return [row.word for row in query]
 
-    def get_post_words_count(self, words):
+    def get_post_words_unique(self, words):
         query = PostWords.select(
             PostWords.word
         ).where(
@@ -189,7 +186,6 @@ class SqliteInterface(object):
         ).group_by(
             PostWords.word
         ).having(fn.Count(PostWords.word) == 1)
-        print(query)
         return [row.word for row in query]
 
     def delete_post(self, post_id):
