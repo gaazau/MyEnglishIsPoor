@@ -35,7 +35,7 @@ class Views(object):
         DbInterface().save_word_list(word_list)
         DbInterface().save_behavior(behavior_list)
         return True
-    
+
     def delete_post_words(self, post_id):
         if not post_id:
             return True
@@ -67,7 +67,11 @@ class GlobalData():
 
     @classmethod
     def reset_data(cls):
-        cls.selected_post = {}
+        cls.selected_post = {
+            "post_id": 0,
+            "title": '',
+            "url": '',
+        }
         cls.post_data = {
             'word_list': [],
             'word_dict': {}
@@ -111,7 +115,8 @@ class GlobalData():
     @classmethod
     def init_behavior_dict(cls):
         # 0: 未读 1：已读 2：停用
-        cls.behavior_dict = DbInterface().get_words_behavior(cls.post_data['word_list'])
+        cls.behavior_dict = DbInterface().get_words_behavior(
+            cls.post_data['word_list'])
         for word in cls.post_data['word_list']:
             if word in cls.behavior_dict:
                 continue
@@ -153,11 +158,11 @@ class GlobalData():
                 'word_statu': v
             })
         return behavior_list
-    
+
     # @classmethod
     # def post_dict_to_db(cls):
     #     return cls.selected_post
-    
+
     @classmethod
     def post_words_to_db(cls):
         post_words = []

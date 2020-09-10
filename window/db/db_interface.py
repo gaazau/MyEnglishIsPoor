@@ -82,6 +82,7 @@ class DbInterface(object):
         self.db.save_post_words(post_data)
         return True
 
+
 class SqliteInterface(object):
     def get_stop_words(self):
         query = Behavior.select(

@@ -7,12 +7,14 @@ class BaseModel(Model):
     class Meta:
         database = database
 
+
 class Behavior(BaseModel):
     word = TextField(null=True, primary_key=True)
     word_statu = IntegerField(constraints=[SQL("DEFAULT 0")])
 
     class Meta:
         table_name = 'behavior'
+
 
 class Post(BaseModel):
     id = IntegerField(primary_key=True, sequence=True)
@@ -23,6 +25,7 @@ class Post(BaseModel):
 
     class Meta:
         table_name = 'post'
+
 
 class PostWords(BaseModel):
     post_id = IntegerField(null=True)
@@ -47,15 +50,14 @@ class WordList(BaseModel):
         table_name = 'word_list'
 
 
-
-
 ############################
-
 database2 = SqliteDatabase('/home/jax/base/data/ecdict-sqlite-28/stardict.db')
+
 
 class BaseModel2(Model):
     class Meta:
         database = database2
+
 
 class Stardict(BaseModel2):
     audio = TextField(null=True)
@@ -78,5 +80,5 @@ class Stardict(BaseModel2):
         indexes = (
             (('sw', 'word'), False),
         )
-        
+
 ############################

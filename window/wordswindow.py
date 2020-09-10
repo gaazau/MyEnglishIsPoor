@@ -50,7 +50,8 @@ class WordsListModel(QtCore.QAbstractTableModel):
             return self.mylist[index.row()][index.column()]
         elif role == Qt.BackgroundRole:
             if index.column() == 0 and self.behavior_dict:
-                statu = self.behavior_dict[self.mylist[index.row()][index.column()]]
+                statu = self.behavior_dict[self.mylist[index.row(
+                )][index.column()]]
                 color = Qt.white
                 if statu == 1:
                     color = Qt.green
@@ -78,6 +79,7 @@ class WordsListModel(QtCore.QAbstractTableModel):
 
 class WordsWindow(QMainWindow, Ui_MainWindow):
     """A window to show the books available"""
+
     def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -91,6 +93,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.tlwPost.clicked.connect(self.selected_post)
         self.btn_post_delete.clicked.connect(self.delete_post_node)
 
+        GlobalData.reset_data()
         self.load_posts()
 
     def load_posts(self):
@@ -115,15 +118,16 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             post_data = DbInterface().get_post(post_id)
             post_words = DbInterface().get_post_word_data(post_id)
             self.refresh_control_post(
-                    post_id=post_id,
-                    title=post_data['title'],
-                    url=post_data['url'],
-                    data="\n".join([row['word'] for row in post_words]),
+                post_id=post_id,
+                title=post_data['title'],
+                url=post_data['url'],
+                data="\n".join([row['word'] for row in post_words]),
             )
             words = GlobalData.create_post_words(self.txtPost.toPlainText())
             GlobalData.init_behavior_dict()
             self.refresh_control_word_list()
-    @Slot()        
+
+    @Slot()
     def delete_post_node(self):
         """删除文章节点"""
         if not GlobalData.selected_post['post_id']:
@@ -133,7 +137,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.refresh_control_post()
         self.refresh_control_word_list()
         self.load_posts()
-        
+
     @Slot()
     def load_file(self):
         """加载外部文件获取文章"""
@@ -157,10 +161,11 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.le_url.setText(url)
         self.txtPost.setText(data)
         GlobalData.set_selected_post(
-                post_id=post_id,
-                title=title,
-                url=url,
-            )
+            post_id=post_id,
+            title=title,
+            url=url,
+        )
+
     @Slot()
     def create_word_list(self):
         """创建文章对应单词表，过滤得到所有未读单词"""
@@ -177,8 +182,8 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
         self.refresh_control_post(
             post_id,
-            self.le_title.text(), 
-            self.le_url.text(), 
+            self.le_title.text(),
+            self.le_url.text(),
             "\n".join([word for word in words])
         )
         self.refresh_control_word_list(filter_mode="unread")
@@ -188,11 +193,12 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         """刷新单词表控件"""
         filter_words = self.filter_word_list(filter_mode)
         word_list_shown = GlobalData.get_word_list_shown(filter_words)
-        model = WordsListModel(self, word_list_shown, GlobalData.word_list_header, GlobalData.behavior_dict)
+        model = WordsListModel(
+            self, word_list_shown, GlobalData.word_list_header, GlobalData.behavior_dict)
         self.tvWords.setModel(model)
         self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-    
+
     def filter_word_list(self, filter_mode="all"):
         """单词过滤"""
         if filter_mode == "unread":
