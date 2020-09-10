@@ -200,6 +200,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.tvWords.setModel(model)
         self.tvWords.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tvWords.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.statusBar().showMessage("共 %s 个单词" % len(word_list_shown))
 
     def filter_word_list(self, filter_mode=0):
         """单词过滤
@@ -218,9 +219,6 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         for word in GlobalData.post_data['word_list']:
             if GlobalData.behavior_dict[word] in filter_mode_dict.get(filter_mode, 0):
                 filter_words.append(word)
-        print("behavior_dict:", GlobalData.behavior_dict)
-        print("#######")
-        print("filter_words:", filter_words)
         return filter_words
 
     @Slot()
