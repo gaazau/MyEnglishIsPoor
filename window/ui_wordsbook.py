@@ -21,6 +21,8 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(1050, 899)
+        self.space_click = QAction(MainWindow)
+        self.space_click.setObjectName(u"space_click")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout_7 = QVBoxLayout(self.centralwidget)
@@ -127,7 +129,10 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addLayout(self.layout)
 
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.cb_filter_words = QComboBox(self.tab_words)
+        self.cb_filter_words.addItem("")
         self.cb_filter_words.addItem("")
         self.cb_filter_words.addItem("")
         self.cb_filter_words.addItem("")
@@ -135,10 +140,29 @@ class Ui_MainWindow(object):
         self.cb_filter_words.addItem("")
         self.cb_filter_words.setObjectName(u"cb_filter_words")
 
-        self.verticalLayout_3.addWidget(self.cb_filter_words)
+        self.horizontalLayout_5.addWidget(self.cb_filter_words)
+
+        self.btn_words_stop = QPushButton(self.tab_words)
+        self.btn_words_stop.setObjectName(u"btn_words_stop")
+
+        self.horizontalLayout_5.addWidget(self.btn_words_stop)
+
+        self.btn_words_ouput = QPushButton(self.tab_words)
+        self.btn_words_ouput.setObjectName(u"btn_words_ouput")
+
+        self.horizontalLayout_5.addWidget(self.btn_words_ouput)
+
+        self.horizontalLayout_5.setStretch(0, 100)
+        self.horizontalLayout_5.setStretch(2, 5)
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
 
         self.tvWords = QTableView(self.tab_words)
         self.tvWords.setObjectName(u"tvWords")
+        self.tvWords.setDragEnabled(True)
+        self.tvWords.setDragDropOverwriteMode(False)
+        self.tvWords.setDragDropMode(QAbstractItemView.DragDrop)
+        self.tvWords.setDefaultDropAction(Qt.MoveAction)
         self.tvWords.setSortingEnabled(True)
 
         self.verticalLayout_3.addWidget(self.tvWords)
@@ -164,21 +188,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addWidget(self.tvPhrase)
 
         self.tabWidget.addTab(self.tab_phrase, "")
-        self.tab_grammer = QWidget()
-        self.tab_grammer.setObjectName(u"tab_grammer")
-        self.verticalLayout_5 = QVBoxLayout(self.tab_grammer)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.cbGrammer = QComboBox(self.tab_grammer)
-        self.cbGrammer.setObjectName(u"cbGrammer")
-
-        self.verticalLayout_5.addWidget(self.cbGrammer)
-
-        self.tvGrammer = QTableView(self.tab_grammer)
-        self.tvGrammer.setObjectName(u"tvGrammer")
-
-        self.verticalLayout_5.addWidget(self.tvGrammer)
-
-        self.tabWidget.addTab(self.tab_grammer, "")
 
         self.verticalLayout_7.addWidget(self.tabWidget)
 
@@ -197,6 +206,10 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.space_click.setText(QCoreApplication.translate("MainWindow", u"space_click", None))
+#if QT_CONFIG(shortcut)
+        self.space_click.setShortcut(QCoreApplication.translate("MainWindow", u"Space", None))
+#endif // QT_CONFIG(shortcut)
         self.btn_post_delete.setText(QCoreApplication.translate("MainWindow", u"\u5220\u9664", None))
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"\u8be6\u7ec6\u4fe1\u606f", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"\u6807\u9898:", None))
@@ -211,14 +224,16 @@ class Ui_MainWindow(object):
         self.btnCreate.setText(QCoreApplication.translate("MainWindow", u"\u751f\u6210\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_op), QCoreApplication.translate("MainWindow", u"\u6587\u7ae0\u64cd\u4f5c", None))
         self.cb_filter_words.setItemText(0, QCoreApplication.translate("MainWindow", u"\u5168\u90e8", None))
-        self.cb_filter_words.setItemText(1, QCoreApplication.translate("MainWindow", u"\u4ec5\u672a\u8bfb", None))
-        self.cb_filter_words.setItemText(2, QCoreApplication.translate("MainWindow", u"\u4ec5\u5df2\u8bfb", None))
-        self.cb_filter_words.setItemText(3, QCoreApplication.translate("MainWindow", u"\u672a\u8bfb+\u5df2\u8bfb", None))
-        self.cb_filter_words.setItemText(4, QCoreApplication.translate("MainWindow", u"\u4ec5\u505c\u7528", None))
+        self.cb_filter_words.setItemText(1, QCoreApplication.translate("MainWindow", u"\u672a\u8bfb", None))
+        self.cb_filter_words.setItemText(2, QCoreApplication.translate("MainWindow", u"\u6807\u8bb0", None))
+        self.cb_filter_words.setItemText(3, QCoreApplication.translate("MainWindow", u"\u638c\u63e1", None))
+        self.cb_filter_words.setItemText(4, QCoreApplication.translate("MainWindow", u"\u505c\u7528", None))
+        self.cb_filter_words.setItemText(5, QCoreApplication.translate("MainWindow", u"\u975e\u505c\u7528", None))
 
+        self.btn_words_stop.setText(QCoreApplication.translate("MainWindow", u"+1", None))
+        self.btn_words_ouput.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u5355\u8bcd", None))
         self.btn_words_save.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0\u72b6\u6001", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_words), QCoreApplication.translate("MainWindow", u"\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_phrase), QCoreApplication.translate("MainWindow", u"\u77ed\u8bed\u672c", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_grammer), QCoreApplication.translate("MainWindow", u"\u53e5\u578b\u672c", None))
     # retranslateUi
 

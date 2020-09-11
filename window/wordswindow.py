@@ -93,6 +93,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.btn_post_delete.clicked.connect(self.delete_post_node)
         self.cb_filter_words.currentIndexChanged.connect(
             self.change_filter_mode)
+        self.btn_words_stop.clicked.connect(self.stop_current_words)
 
         self.cb_filter_words.setCurrentIndex(1)
         GlobalData.reset_data()
@@ -170,7 +171,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def create_word_list(self):
-        """创建文章对应单词表，过滤得到所有未读单词"""
+        """创建文章对应单词表,过滤得到所有未读单词"""
         post_id = DbInterface().create_post(
             title=self.le_title.text(),
             url=self.le_url.text()
@@ -205,14 +206,15 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     def filter_word_list(self, filter_mode=0):
         """单词过滤
 
-        0:全部 1:仅未读 2:仅已读 3:未读+已读 4:仅停用
+        0:全部 1:未读 2:标记 3:掌握 4:停用 5: 非停用
         """
         filter_mode_dict = {
-            0: (0, 1, 2),
+            0: (0, 1, 2, 3),
             1: (0,),
             2: (1,),
-            3: (0, 1),
-            4: (2,),
+            3: (2),
+            4: (3,),
+            5: (0, 1, 2),
         }
         filter_words = []
 
@@ -223,10 +225,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def tvWords_left_click(self, item):
-        """单词点击，修改单词已读未读状态"""
+        """单词点击,修改单词已读未读状态"""
         if item.column() == 0 and item.row() >= 0:
             statu = GlobalData.behavior_dict[item.data()]
-            GlobalData.behavior_dict[item.data()] = (statu + 1) % 3
+            GlobalData.behavior_dict[item.data()] = (statu + 1) % 4
 
     @Slot()
     def update_word_list(self):
@@ -243,3 +245,27 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         else:
             GlobalData.words_filter_mode = index
         self.refresh_control_word_list()
+
+    @Slot()
+    def stop_current_words(self):
+        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        if not filter_words:
+            return
+        counter_dict = {
+            0: 0, 
+            1: 0,
+            2: 0,
+            3: 0,
+        }
+        for word in filter_words:
+            if word in GlobalData.behavior_dict:
+                GlobalData.behavior_dict[word] = (GlobalData.behavior_dict[word] + 1) % 4
+                counter_dict[GlobalData.behavior_dict[word]] +=1
+        show_words = "*当前单词状态:({}未读,{}标记,{}掌握,{}停用)".format(
+            counter_dict[0],
+            counter_dict[1],
+            counter_dict[2],
+            counter_dict[3],
+        )
+        tip_words = "共 %s 个单词" % len(filter_words)
+        self.statusBar().showMessage(tip_words + " " + show_words)

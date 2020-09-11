@@ -123,7 +123,7 @@ class GlobalData():
 
     @classmethod
     def init_behavior_dict(cls):
-        # 0: 未读 1：已读 2：停用
+        # 0: 未读 1：标记 2：掌握 3: 停用
         cls.behavior_dict = DbInterface().get_words_behavior(
             cls.post_data['word_list'])
         for word in cls.post_data['word_list']:
@@ -132,7 +132,7 @@ class GlobalData():
             statu = 0
             if cls.is_stop_words(cls.post_data['word_dict'][word]):
                 # 可停用词
-                statu = 2
+                statu = 3
             cls.behavior_dict[word] = statu
         return cls.behavior_dict
 
