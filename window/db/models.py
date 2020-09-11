@@ -44,7 +44,7 @@ class WordList(BaseModel):
     phonetic = IntegerField(constraints=[SQL("DEFAULT ''")])
     translation = IntegerField(constraints=[SQL("DEFAULT ''")])
     word = TextField(null=True, primary_key=True)
-    word_type = IntegerField(constraints=[SQL("DEFAULT ''")])
+    pos = TextField()
 
     class Meta:
         table_name = 'word_list'

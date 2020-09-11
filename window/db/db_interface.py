@@ -96,6 +96,7 @@ class SqliteInterface(object):
             Stardict.phonetic,
             Stardict.definition,
             Stardict.translation,
+            Stardict.pos,
         ).where(Stardict.word.in_(words))
         words_dict = {}
         # key ignore Caps
@@ -104,7 +105,8 @@ class SqliteInterface(object):
                 'word': row.word.lower(),
                 'phonetic': row.phonetic,
                 'definition': row.definition,
-                'translation': row.translation
+                'translation': row.translation,
+                'pos': row.pos,
             }
         return words_dict
 
