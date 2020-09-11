@@ -7,6 +7,7 @@ from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
 from PySide2.QtCore import Qt, Slot, QFile
 # import createdb
 from ui_wordsbook import Ui_MainWindow
+from datetime import datetime
 # from bookdelegate import BookDelegate
 
 from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
@@ -23,6 +24,7 @@ from core.views import GlobalData
 
 from copy import deepcopy
 import settings
+from upload import upload_to_bbdc
 
 
 class WordsListModel(QtCore.QAbstractTableModel):
@@ -97,6 +99,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             self.change_filter_mode)
         self.btn_words_stop.clicked.connect(self.stop_current_words)
         self.btn_words_ouput.clicked.connect(self.output_word_list)
+        self.btn_upload_bbdc.clicked.connect(self.upload_to_bbdc)
 
         self.cb_filter_words.setCurrentIndex(1)
         GlobalData.reset_data()
@@ -255,15 +258,16 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         if not filter_words:
             return
         counter_dict = {
-            0: 0, 
+            0: 0,
             1: 0,
             2: 0,
             3: 0,
         }
         for word in filter_words:
             if word in GlobalData.behavior_dict:
-                GlobalData.behavior_dict[word] = (GlobalData.behavior_dict[word] + 1) % 4
-                counter_dict[GlobalData.behavior_dict[word]] +=1
+                GlobalData.behavior_dict[word] = (
+                    GlobalData.behavior_dict[word] + 1) % 4
+                counter_dict[GlobalData.behavior_dict[word]] += 1
         show_words = "*当前单词状态:({}未读,{}标记,{}掌握,{}停用)".format(
             counter_dict[0],
             counter_dict[1],
@@ -280,9 +284,34 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             return
         words = "\n".join(sorted([str(word) for word in filter_words]))
 
-        fname, ftype = QFileDialog.getSaveFileName(self, 'save file', './', "ALL (*.*)")
+        fname, ftype = QFileDialog.getSaveFileName(
+            self, 'save file', './', "ALL (*.*)")
         with open(fname, 'w') as fn:
             fn.write(words)
         tip_words = "共 %s 个单词" % len(filter_words)
         tip_other = "已导出单词本:%s" % fname
         self.statusBar().showMessage(tip_words + " " + tip_other)
+
+    @Slot()
+    def upload_to_bbdc(self):
+        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        if not filter_words:
+            return
+        flag = QMessageBox.question(self, "上传当前单词", "是否上传至不背单词?")
+
+        if str(flag)[-1] != 's':
+            return 
+        try:
+            if not upload_to_bbdc.MY_COOKIES:
+                upload_to_bbdc.login_bbdc(
+                    settings.BBDC_USER_NAME, settings.BBDC_PASSWORD)
+            result = upload_to_bbdc.post_my_list(
+                ",".join(filter_words),
+                name=self.le_title.text()[:15],
+                desc="%s:%s" % (settings.FILTER_MODE[GlobalData.words_filter_mode], datetime.now(
+                ).strftime("%Y-%m-%d"))
+            )
+            msg = "上传成功-%s,不背单词官网:%s" % (datetime.now().strftime("%H:%M:%S"), "https://bbdc.cn/lexis_book_index")
+        except Exception as ex:
+            msg = "上传失败-%s:%s" % (datetime.now().strftime("%H:%M:%S"), str(ex))
+        self.statusBar().showMessage(msg)

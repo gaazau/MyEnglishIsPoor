@@ -5,4 +5,22 @@ STOP_WORDS_IN_TRANSLATION = [
 ]
 
 # 直接停用词
-STOP_WORDS_LIST = (*[chr(i) for i in range(65, 91)], *[chr(i) for i in range(97, 123)])
+STOP_WORDS_LIST = (
+    *[chr(i) for i in range(65, 91)],
+    *[chr(i) for i in range(97, 123)],
+    *['a', 'any word to stop']
+)
+
+# bbdc
+BBDC_USER_NAME = ''
+BBDC_PASSWORD = ''
+
+# 筛选状态
+FILTER_MODE = {
+    0: "全部",
+    1: "未读",
+    2: "标记",
+    3: "掌握",
+    4: "停用",
+    5: "非停用",
+}

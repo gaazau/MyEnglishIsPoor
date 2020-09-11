@@ -152,6 +152,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.btn_words_ouput)
 
+        self.btn_upload_bbdc = QPushButton(self.tab_words)
+        self.btn_upload_bbdc.setObjectName(u"btn_upload_bbdc")
+
+        self.horizontalLayout_5.addWidget(self.btn_upload_bbdc)
+
         self.horizontalLayout_5.setStretch(0, 100)
         self.horizontalLayout_5.setStretch(2, 5)
 
@@ -198,7 +203,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -232,6 +237,7 @@ class Ui_MainWindow(object):
 
         self.btn_words_stop.setText(QCoreApplication.translate("MainWindow", u"+1", None))
         self.btn_words_ouput.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u5355\u8bcd", None))
+        self.btn_upload_bbdc.setText(QCoreApplication.translate("MainWindow", u"\u4e0a\u4f20\u81f3\u4e0d\u80cc\u5355\u8bcd", None))
         self.btn_words_save.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0\u72b6\u6001", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_words), QCoreApplication.translate("MainWindow", u"\u5355\u8bcd\u672c", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_phrase), QCoreApplication.translate("MainWindow", u"\u77ed\u8bed\u672c", None))

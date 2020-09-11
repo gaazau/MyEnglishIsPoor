@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_op">
        <attribute name="title">
@@ -129,7 +129,7 @@ p, li { white-space: pre-wrap; }
          <layout class="QHBoxLayout" name="layout"/>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="100,0,5">
+         <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="100,0,5,0">
           <item>
            <widget class="QComboBox" name="cb_filter_words">
             <item>
@@ -175,6 +175,13 @@ p, li { white-space: pre-wrap; }
            <widget class="QPushButton" name="btn_words_ouput">
             <property name="text">
              <string>导出单词</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_upload_bbdc">
+            <property name="text">
+             <string>上传至不背单词</string>
             </property>
            </widget>
           </item>
