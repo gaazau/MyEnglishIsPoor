@@ -2,3 +2,5 @@ rubbish/
 .vscode/
 static/
 *.pyc
+.pytest_cache/
+__pycache__/
