@@ -140,7 +140,13 @@ class GlobalData():
     def get_frequent_word_type(pos):
         """选取最常用的词性作为分类"""
         pos_list = pos.split("/")
-        return pos_list[0][0]
+        try:
+            if len(pos_list) == 1:
+                return pos_list[0][0]
+            new_post_list = [pos.split(":") for pos in pos_list]
+            return sorted(new_post_list, key=lambda x: x[1], reverse=True)[0][0]
+        except Exception:
+            return "-"
         
     @classmethod
     def get_word_list_shown(cls, words):
