@@ -11,10 +11,6 @@ STOP_WORDS_LIST = (
     *['a', 'any word to stop']
 )
 
-# bbdc
-BBDC_USER_NAME = ''
-BBDC_PASSWORD = ''
-
 # 筛选状态
 FILTER_MODE = {
     0: "全部",

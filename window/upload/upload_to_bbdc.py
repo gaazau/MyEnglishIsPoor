@@ -20,12 +20,15 @@ HEADER_NORMAL = {
 
 MY_COOKIES = ""
 
-def login_bbdc(user_id, password):
+def login_bbdc():
     global MY_COOKIES
     url_login = "https://bbdc.cn/login"
+    user_info = {}
+    with open('window/upload/bbdc_user_info.json', 'r') as f:
+        user_info = json.load(f)
     params = {
-        "userName": user_id,
-        "passwd": password,
+        "userName": user_info['user_name'],
+        "passwd": user_info['password'],
     }
     headers = deepcopy(HEADER_NORMAL)
     resp = requests.get(url_login, params=params, headers=HEADER_NORMAL)

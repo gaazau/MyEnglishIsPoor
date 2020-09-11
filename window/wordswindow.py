@@ -303,8 +303,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             return 
         try:
             if not upload_to_bbdc.MY_COOKIES:
-                upload_to_bbdc.login_bbdc(
-                    settings.BBDC_USER_NAME, settings.BBDC_PASSWORD)
+                upload_to_bbdc.login_bbdc()
             result = upload_to_bbdc.post_my_list(
                 ",".join(filter_words),
                 name=self.le_title.text()[:15],

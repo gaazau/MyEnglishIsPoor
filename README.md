@@ -5,3 +5,5 @@
 - 生成单词本
 - 生成语法本
 - 历史数据统计
+
+rename settings.default.py -> settings.py
