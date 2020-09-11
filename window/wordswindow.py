@@ -214,7 +214,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             0: (0, 1, 2, 3),
             1: (0,),
             2: (1,),
-            3: (2),
+            3: (2,),
             4: (3,),
             5: (0, 1, 2),
         }
