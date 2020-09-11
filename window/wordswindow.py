@@ -96,6 +96,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         self.cb_filter_words.currentIndexChanged.connect(
             self.change_filter_mode)
         self.btn_words_stop.clicked.connect(self.stop_current_words)
+        self.btn_words_ouput.clicked.connect(self.output_word_list)
 
         self.cb_filter_words.setCurrentIndex(1)
         GlobalData.reset_data()
@@ -271,3 +272,17 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         )
         tip_words = "共 %s 个单词" % len(filter_words)
         self.statusBar().showMessage(tip_words + " " + show_words)
+
+    @Slot()
+    def output_word_list(self):
+        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        if not filter_words:
+            return
+        words = "\n".join(sorted([str(word) for word in filter_words]))
+
+        fname, ftype = QFileDialog.getSaveFileName(self, 'save file', './', "ALL (*.*)")
+        with open(fname, 'w') as fn:
+            fn.write(words)
+        tip_words = "共 %s 个单词" % len(filter_words)
+        tip_other = "已导出单词本:%s" % fname
+        self.statusBar().showMessage(tip_words + " " + tip_other)
