@@ -56,6 +56,8 @@ class WordsListModel(QtCore.QAbstractTableModel):
                     color = Qt.green
                 elif statu == 2:
                     color = Qt.gray
+                elif statu == 3:
+                    color = Qt.red
                 return QColor(color)
         return None
 
