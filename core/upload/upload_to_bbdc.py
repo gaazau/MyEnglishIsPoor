@@ -3,7 +3,8 @@ import requests
 from copy import deepcopy
 import json
 
-from settings import BBDC_USERINFO_FILE
+from settings import BBDC_USER_NAME
+from settings import BBDC_PASSWORD
 
 HEADER_NORMAL = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -26,11 +27,9 @@ def login_bbdc():
     global MY_COOKIES
     url_login = "https://bbdc.cn/login"
     user_info = {}
-    with open(BBDC_USERINFO_FILE, 'r') as f:
-        user_info = json.load(f)
     params = {
-        "userName": user_info['user_name'],
-        "passwd": user_info['password'],
+        "userName": BBDC_USER_NAME,
+        "passwd": BBDC_PASSWORD,
     }
     headers = deepcopy(HEADER_NORMAL)
     resp = requests.get(url_login, params=params, headers=HEADER_NORMAL)
