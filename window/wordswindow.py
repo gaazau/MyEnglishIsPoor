@@ -153,16 +153,19 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         path = QFileDialog.getOpenFileName(
             self, "Open File", '', "Any Files (*.*)")
         if path:
-            inFile = QFile(path[0])
-            if inFile.open(QFile.ReadOnly | QFile.Text):
-                text = str(inFile.readAll(), encoding='utf8')
-                _, filename = os.path.split(inFile.fileName())
-                self.refresh_control_post(
-                    post_id=0,
-                    title=filename,
-                    url="",
-                    data=text,
-                )
+            try:
+                inFile = QFile(path[0])
+                if inFile.open(QFile.ReadOnly | QFile.Text):
+                    text = str(inFile.readAll(), encoding='utf8')
+                    _, filename = os.path.split(inFile.fileName())
+                    self.refresh_control_post(
+                        post_id=0,
+                        title=filename,
+                        url="",
+                        data=text,
+                    )
+            except Exception as ex:
+                self.statusBar().showMessage("文件读取错误:%s" % str(ex))
 
     def refresh_control_post(self, post_id=0, title="", url="", data=""):
         """刷新文章控件内容"""
