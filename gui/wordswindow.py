@@ -280,9 +280,10 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
         if not filter_words:
             return
         words = "\n".join(sorted([str(word) for word in filter_words]))
-
         fname, ftype = QFileDialog.getSaveFileName(
             self, 'save file', './', "ALL (*.*)")
+        if not fname:
+            return 
         with open(fname, 'w') as fn:
             fn.write(words)
         tip_words = "共 %s 个单词" % len(filter_words)

@@ -23,3 +23,5 @@ FILTER_MODE = {
 
 # sqlite db， 单词本及行为定义的相关库表
 MY_WORDS_DB = "my_words.db"
+
+BBDC_USERINFO_FILE = "bbdc_user_info.json"
