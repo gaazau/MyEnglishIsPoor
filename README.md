@@ -6,6 +6,14 @@
 - 支持标记单词状态:未读,标记,掌握和停用四种状态
 - 支持将单词本上传至不背单词app(需在config.json填写用户名和密码)
 
+## 界面概览
+![image](https://github.com/gaazau/MyEnglishIsPoor/blob/master/images/mian_post_00.png)  
+
+![image](https://github.com/gaazau/MyEnglishIsPoor/blob/master/images/main_post_01.png)  
+
+![image](https://github.com/gaazau/MyEnglishIsPoor/blob/master/images/main_word_list.png)  
+
+
 ## 备注
 软件是基于pyside2和github上某个开源的单词数据库ECDict开发的。  
 
