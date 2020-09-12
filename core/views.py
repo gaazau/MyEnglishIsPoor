@@ -183,10 +183,10 @@ class GlobalData():
             detail = star_words_dict.get(str(word).lower(), {})
             cls.post_data['word_dict'][word] = {
                 'word': word,
-                'translation': detail.get('translation') or '--',
-                'phonetic': detail.get('phonetic') or '--',
-                'definition': detail.get('definition') or '--',
-                'pos': detail.get('pos') or '--',
+                'translation': detail.get('translation') or ' ',
+                'phonetic': detail.get('phonetic') or ' ',
+                'definition': detail.get('definition') or ' ',
+                'pos': detail.get('pos') or ' ',
             }
 
         # 解析短语
@@ -196,13 +196,13 @@ class GlobalData():
             detail = phrase_dict.get(phrase, {})
             if not detail:
                 continue
-            if not (detail["translation"] or detail["definition"]):
+            if not (detail["translation"].strip() or detail["definition"].strip()):
                 continue
             cls.post_data['word_dict'][phrase] = {
                 'word': phrase,
-                'translation': detail.get('translation') or '--',
-                'phonetic': detail.get('phonetic') or '--',
-                'definition': detail.get('definition') or '--',
+                'translation': detail.get('translation') or ' ',
+                'phonetic': detail.get('phonetic') or ' ',
+                'definition': detail.get('definition') or ' ',
                 'pos': 'zz',
             }
             cls.post_data['word_list'].append(phrase)
@@ -210,7 +210,7 @@ class GlobalData():
 
     @staticmethod
     def is_stop_words(word_obj):
-        if not (word_obj['translation'] or word_obj['definition']):
+        if not (word_obj['translation'].strip() or word_obj['definition'].strip()):
             # 无释义
             return True
         if word_obj['word'] in settings.STOP_WORDS_LIST:
