@@ -1,6 +1,6 @@
 import sys
 from PySide2.QtWidgets import QApplication
-from wordswindow import WordsWindow
+from gui.wordswindow import WordsWindow
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -1,30 +1,24 @@
 import os
+import operator
+from datetime import datetime
+from copy import deepcopy
 
 from PySide2.QtWidgets import (QAbstractItemView, QDataWidgetMapper, QFileDialog,
                                QHeaderView, QMainWindow, QMessageBox)
 from PySide2.QtGui import QKeySequence, QColor
 from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
 from PySide2.QtCore import Qt, Slot, QFile
-# import createdb
-from ui_wordsbook import Ui_MainWindow
-from datetime import datetime
-# from bookdelegate import BookDelegate
-
 from PySide2.QtSql import QSqlRelation, QSqlRelationalTableModel, QSqlTableModel
-
-from core.views import Views
-
-import operator
 from PySide2 import QtWidgets
 from PySide2 import QtGui
 from PySide2 import QtCore
 
-from db.db_interface import DbInterface
-from core.views import GlobalData
-
-from copy import deepcopy
 import settings
-from upload import upload_to_bbdc
+from core.views import GlobalData
+from core.upload import upload_to_bbdc
+from core.views import Views
+from core.db.db_interface import DbInterface
+from gui.ui.ui_wordsbook import Ui_MainWindow
 
 
 class WordsListModel(QtCore.QAbstractTableModel):

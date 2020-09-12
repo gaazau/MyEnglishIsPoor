@@ -1,9 +1,8 @@
 import re
-import settings
-from nltk import word_tokenize
-from nltk import pos_tag
 from copy import deepcopy
-from db.db_interface import DbInterface
+
+from core.db.db_interface import DbInterface
+import settings
 
 
 class Views(object):

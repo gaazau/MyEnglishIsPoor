@@ -1,6 +1,7 @@
 from peewee import *
 
-database = SqliteDatabase('window/db/my_words.db')
+import settings 
+database = SqliteDatabase(settings.MY_WORDS_DB)
 
 
 class BaseModel(Model):

@@ -1,12 +1,12 @@
-from db.models import Behavior
-from db.models import Post
-from db.models import WordList
-from db.models import Stardict
-from db.models import PostWords
 from datetime import datetime
 
-
 from peewee import fn
+
+from core.db.models import Behavior
+from core.db.models import Post
+from core.db.models import WordList
+from core.db.models import Stardict
+from core.db.models import PostWords
 
 
 class DbInterface(object):

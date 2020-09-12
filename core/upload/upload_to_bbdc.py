@@ -1,4 +1,4 @@
-# 将单词本上传至不背单词
+"""支持上传单词本到不背单词"""
 import requests
 from copy import deepcopy
 import json

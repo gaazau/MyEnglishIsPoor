@@ -20,3 +20,6 @@ FILTER_MODE = {
     4: "停用",
     5: "非停用",
 }
+
+# sqlite db， 单词本及行为定义的相关库表
+MY_WORDS_DB = "my_words.db"
