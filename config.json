@@ -6,6 +6,7 @@
     "STOP_WORDS_LIST": [
         "any word to stop"
     ],
+    "START_DICT_DB": "/home/jax/base/data/ecdict-sqlite-28/stardict.db",
     "MY_WORDS_DB": "my_words.db",
     "BBDC_USER_NAME": "",
     "BBDC_PASSWORD": ""

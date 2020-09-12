@@ -10,8 +10,11 @@ STOP_WORDS_IN_TRANSLATION = CONFIG['STOP_WORDS_IN_TRANSLATION']
 STOP_WORDS_LIST = CONFIG['STOP_WORDS_LIST']
 
 
-# sqlite db， 单词本及行为定义的相关库表
+# sqlite db， 个人数据库
 MY_WORDS_DB = CONFIG['MY_WORDS_DB']
+
+# sqlite_db, 本地离线词典数据库
+START_DICT_DB = CONFIG['START_DICT_DB']
 
 # 不背单词的个人账号密码
 BBDC_USER_NAME = CONFIG['BBDC_USER_NAME']

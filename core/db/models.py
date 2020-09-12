@@ -52,7 +52,7 @@ class WordList(BaseModel):
 
 
 ############################
-database2 = SqliteDatabase('/home/jax/base/data/ecdict-sqlite-28/stardict.db')
+database2 = SqliteDatabase(settings.START_DICT_DB)
 
 
 class BaseModel2(Model):
