@@ -282,7 +282,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def output_word_list(self):
-        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        filter_words = GlobalData.current_words
         if not filter_words:
             return
         words = "\n".join(sorted([str(word) for word in filter_words]))
@@ -297,13 +297,15 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def upload_to_bbdc(self):
-        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        filter_words = GlobalData.current_words
         if not filter_words:
             return
-        flag = QMessageBox.question(self, "上传当前单词", "是否上传至不背单词?")
+        flag = QMessageBox.question(
+            self, "上传当前单词", "是否上传至不背单词?\n官网：%s" % "bbdc.cn")
 
         if str(flag)[-1] != 's':
-            return 
+            return
+        tip_words = "共 %s 个单词" % len(filter_words)
         try:
             if not upload_to_bbdc.MY_COOKIES:
                 upload_to_bbdc.login_bbdc()
@@ -313,7 +315,8 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
                 desc="%s:%s" % (settings.FILTER_MODE[GlobalData.words_filter_mode], datetime.now(
                 ).strftime("%Y-%m-%d"))
             )
-            msg = "上传成功-%s,不背单词官网:%s" % (datetime.now().strftime("%H:%M:%S"), "https://bbdc.cn/lexis_book_index")
+            msg = tip_words + " 上传成功-%s" % datetime.now().strftime("%H:%M:%S")
         except Exception as ex:
-            msg = "上传失败-%s:%s" % (datetime.now().strftime("%H:%M:%S"), str(ex))
+            msg = tip_words + \
+                " 上传失败-%s:%s" % (datetime.now().strftime("%H:%M:%S"), str(ex))
         self.statusBar().showMessage(msg)
