@@ -42,6 +42,8 @@ class Views(object):
     def get_post_words(self, txt_post):
         return self.extract_english_words(txt_post)
 
+    
+
 
 class GlobalData():
     word_list_header = ['单词', '中文定义', '发音', '英文定义', '词性分类']
@@ -144,8 +146,8 @@ class GlobalData():
         """选取最常用的词性作为分类"""
         pos_list = pos.split("/")
         try:
-            if len(pos_list) == 1:
-                return pos_list[0][0]
+            if len(pos_list) <= 0:
+                return '-'
             new_post_list = [pos.split(":") for pos in pos_list]
             return sorted(new_post_list, key=lambda x: x[1], reverse=True)[0][0]
         except Exception:
