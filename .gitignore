@@ -1,6 +1,8 @@
+config.json
 rubbish/
 .vscode/
 static/
 *.pyc
 .pytest_cache/
 __pycache__/
+*.db

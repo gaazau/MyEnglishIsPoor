@@ -22,5 +22,5 @@
 
 
 ## 其他
-用的是ECDict的本地离线词典，数据库文件比较大，就不放仓库里面了，附带下载链接，下载后解压至与CONFIG.json配置的路径下即可    
+用的是ECDict的本地离线词典，数据库文件比较大，就不放仓库里面了，附带下载链接，下载后解压至与config.json配置的路径下即可    
 >ECDict sqlite db : https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
