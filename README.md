@@ -13,10 +13,14 @@
 
 ![image](https://github.com/gaazau/MyEnglishIsPoor/blob/master/images/main_word_list.png)  
 
-
 ## 备注
 软件是基于pyside2和github上某个开源的单词数据库ECDict开发的。  
 
 本人刚接触pyside2没几天，在对pyside2完全没搞懂的情况下就撸起袖子瞎瘠薄乱写，以至于代码逻辑混乱糟糕，如果看代码就能发现许多功能有"非一般"的写法。   
 
 而且也苦于不熟悉pyside2(除了官网能看下api文档，其他基本都找不到好的资源，想学好也真的是好难啊QAQ),也导致许多人性化的功能和设想都没能实现，只能留待以后学好之后再来奋战了...  
+
+
+## 其他
+用的是ECDict的本地离线词典，数据库文件比较大，就不放仓库里面了，附带下载链接，下载后解压至与CONFIG.json配置的路径下即可    
+>ECDict sqlite db : https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
