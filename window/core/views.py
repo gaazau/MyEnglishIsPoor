@@ -53,6 +53,8 @@ class GlobalData():
     behavior_dict = {}
     words_filter_mode = 0
 
+    current_words = []
+
     @classmethod
     def reset_data(cls):
         cls.selected_post = {
@@ -65,6 +67,7 @@ class GlobalData():
             'word_dict': {}
         }
         cls.behavior_dict = {}
+        cls.current_words = []
 
     @classmethod
     def set_selected_post(cls, post_id=0, title="", url=""):

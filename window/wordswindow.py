@@ -201,6 +201,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
     def refresh_control_word_list(self):
         """刷新单词表控件"""
         filter_words = self.filter_word_list(GlobalData.words_filter_mode)
+        GlobalData.current_words = deepcopy(filter_words)
         word_list_shown = GlobalData.get_word_list_shown(filter_words)
         model = WordsListModel(
             self, word_list_shown, GlobalData.word_list_header, GlobalData.behavior_dict)
@@ -254,8 +255,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
 
     @Slot()
     def stop_current_words(self):
-        filter_words = self.filter_word_list(GlobalData.words_filter_mode)
-        if not filter_words:
+        if not GlobalData.current_words:
             return
         counter_dict = {
             0: 0,
@@ -263,7 +263,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             2: 0,
             3: 0,
         }
-        for word in filter_words:
+        for word in GlobalData.current_words:
             if word in GlobalData.behavior_dict:
                 GlobalData.behavior_dict[word] = (
                     GlobalData.behavior_dict[word] + 1) % 4
@@ -274,7 +274,7 @@ class WordsWindow(QMainWindow, Ui_MainWindow):
             counter_dict[2],
             counter_dict[3],
         )
-        tip_words = "共 %s 个单词" % len(filter_words)
+        tip_words = "共 %s 个单词" % len(GlobalData.current_words)
         self.statusBar().showMessage(tip_words + " " + show_words)
 
     @Slot()

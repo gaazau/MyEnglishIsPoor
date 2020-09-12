@@ -178,21 +178,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.btn_words_save)
 
         self.tabWidget.addTab(self.tab_words, "")
-        self.tab_phrase = QWidget()
-        self.tab_phrase.setObjectName(u"tab_phrase")
-        self.verticalLayout_4 = QVBoxLayout(self.tab_phrase)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.cbPhrase = QComboBox(self.tab_phrase)
-        self.cbPhrase.setObjectName(u"cbPhrase")
-
-        self.verticalLayout_4.addWidget(self.cbPhrase)
-
-        self.tvPhrase = QTableView(self.tab_phrase)
-        self.tvPhrase.setObjectName(u"tvPhrase")
-
-        self.verticalLayout_4.addWidget(self.tvPhrase)
-
-        self.tabWidget.addTab(self.tab_phrase, "")
 
         self.verticalLayout_7.addWidget(self.tabWidget)
 
@@ -203,7 +188,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -240,6 +225,5 @@ class Ui_MainWindow(object):
         self.btn_upload_bbdc.setText(QCoreApplication.translate("MainWindow", u"\u4e0a\u4f20\u81f3\u4e0d\u80cc\u5355\u8bcd", None))
         self.btn_words_save.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0\u72b6\u6001", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_words), QCoreApplication.translate("MainWindow", u"\u5355\u8bcd\u672c", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_phrase), QCoreApplication.translate("MainWindow", u"\u77ed\u8bed\u672c", None))
     # retranslateUi
 
