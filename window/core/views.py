@@ -7,11 +7,92 @@ from db.db_interface import DbInterface
 
 
 class Views(object):
+    def extrace_re_content(self, re_pattern, content):
+        if not content:
+            return []
+        pattern = re.compile(re_pattern)
+        result = []
+        for value in re.findall(pattern, content):
+            if isinstance(value, tuple):
+                result.append(" ".join(value))
+            else:
+                result.append(value)
+        return result
+
     def extract_english_words(self, content):
         """提取英文单词"""
         if not content:
             return []
-        return sorted(set(re.findall(re.compile(r"[a-zA-Z]+(?:[-'][a-zA-Z]+)*"), content)))
+        return sorted(set(self.extrace_re_content(r"[a-zA-Z]+(?:[-'][a-zA-Z]+)*", content)))
+
+    def extract_english_phrase(self, content):
+        """提取英文短语
+
+        提取模式: A B 介 | A 介 | B 介 | B 介 C | 介 C D | 介 D |  介 C
+        去重后返回
+        """
+        if not content:
+            return []
+        phrase_set = set()
+        word = "([a-zA-Z]+)"
+        prev = "(about|above|across|after|among|at|behind|below|besides|beside|between|by|except|for|from|front|inside|into|in|off|of|on|opposite|outside|over|throughout|through|to|under|without|within|with)"
+        # 保证是介词，而不是某个单词中的截断内容
+        no_alph_behind = "(?![a-zA-Z])"
+        no_alph_before = "(?<![a-zA-Z])"
+        # A B 介
+        re_pattern = r"" + word + " " + word + " " + prev + no_alph_behind
+        result = set(
+            self.extrace_re_content(
+                re_pattern,
+                content,
+            )
+        )
+        phrase_set.update(result)
+        # A 介
+        for p in result:
+            words = p.split()
+            phrase_set.add(words[0] + " " + words[2])
+        # B 介
+        re_pattern = r"" + word + " " + prev + no_alph_behind
+        result = set(
+            self.extrace_re_content(
+                re_pattern,
+                content,
+            )
+        )
+        phrase_set.update(result)
+        # B 介 C
+        re_pattern = r"" + word + " " + prev + " " + word
+        result = set(
+            self.extrace_re_content(
+                re_pattern,
+                content,
+            )
+        )
+        phrase_set.update(result)
+        # 介 C
+        re_pattern = r""+ no_alph_before + prev + " " + word
+        result = set(
+            self.extrace_re_content(
+                re_pattern,
+                content,
+            )
+        )
+        phrase_set.update(result)
+        # 介 C D
+        re_pattern = r""+ no_alph_before + prev + " " + word + " " + word
+        result = set(
+            self.extrace_re_content(
+                re_pattern,
+                content,
+            )
+        )
+        phrase_set.update(result)
+        # 介 D
+        for p in result:
+            words = p.split()
+            phrase_set.add(words[0] + " " + words[2])
+        return sorted([str(w).lower() for w in phrase_set])
 
     def exclude_stop_words(self, src_words, stop_words):
         if not stop_words or not src_words:
@@ -42,8 +123,6 @@ class Views(object):
     def get_post_words(self, txt_post):
         return self.extract_english_words(txt_post)
 
-    
-
 
 class GlobalData():
     word_list_header = ['单词', '中文定义', '发音', '英文定义', '词性分类']
@@ -57,7 +136,7 @@ class GlobalData():
 
     current_words = []
 
-    @classmethod
+    @ classmethod
     def reset_data(cls):
         cls.selected_post = {
             "post_id": 0,
@@ -88,7 +167,7 @@ class GlobalData():
         for word in origin_words:
             clean_words.add(str(word).lower())
         return sorted(clean_words)
-        
+
     @classmethod
     def get_post_words(cls, txt_post=""):
         # 选中文章对应单词列表(全)
@@ -110,6 +189,24 @@ class GlobalData():
                 'definition': detail.get('definition') or '--',
                 'pos': detail.get('pos') or '--',
             }
+
+        # 解析短语
+        origin_phrase_list = Views().extract_english_phrase(txt_post)
+        phrase_dict = DbInterface().get_words_detail(origin_phrase_list)
+        for phrase in origin_phrase_list:
+            detail = phrase_dict.get(phrase, {})
+            if not detail:
+                continue
+            if not (detail["translation"] or detail["definition"]):
+                continue
+            cls.post_data['word_dict'][phrase] = {
+                'word': phrase,
+                'translation': detail.get('translation') or '--',
+                'phonetic': detail.get('phonetic') or '--',
+                'definition': detail.get('definition') or '--',
+                'pos': 'zz',
+            }
+            cls.post_data['word_list'].append(phrase)
         return cls.post_data['word_list']
 
     @staticmethod
@@ -146,19 +243,20 @@ class GlobalData():
         """选取最常用的词性作为分类"""
         pos_list = pos.split("/")
         try:
-            if len(pos_list) <= 0:
-                return '-'
+            if len(pos_list) <= 1:
+                return pos.split(":")[0]
             new_post_list = [pos.split(":") for pos in pos_list]
             return sorted(new_post_list, key=lambda x: x[1], reverse=True)[0][0]
         except Exception:
             return "-"
-        
+
     @classmethod
     def get_word_list_shown(cls, words):
         word_list = []
         # word_list_header = ['单词', '中文定义', '发音', '英文定义', '词性分类']
         for word in words:
-            word_type_frequent = cls.get_frequent_word_type(cls.post_data['word_dict'][word]['pos'])
+            word_type_frequent = cls.get_frequent_word_type(
+                cls.post_data['word_dict'][word]['pos'])
             word_list.append([
                 word,
                 cls.post_data['word_dict'][word]['translation'],
